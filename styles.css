@@ -1,0 +1,133 @@
+/* ===========================================================================
+   JCABSS AI Study Buddy — shared styles
+   Aesthetic: warm, confident, focused. Deep ink + emerald, amber accent.
+   =========================================================================== */
+
+@import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Outfit:wght@400;500;600;700&display=swap');
+
+:root {
+  --ink:        #0e1b17;   /* near-black green */
+  --ink-2:      #16302a;
+  --paper:      #f6f3ec;   /* warm off-white */
+  --paper-2:    #fffdf8;
+  --emerald:    #11806a;
+  --emerald-d:  #0c5f4f;
+  --emerald-l:  #4db89c;
+  --amber:      #e8a13a;
+  --amber-d:    #c9842a;
+  --rose:       #d4604f;
+  --line:       #dcd6c8;
+  --muted:      #6f7d76;
+  --shadow:     0 10px 40px -12px rgba(14,27,23,.28);
+  --shadow-sm:  0 4px 16px -6px rgba(14,27,23,.22);
+  --radius:     18px;
+  --radius-sm:  12px;
+  --display:    'Fraunces', Georgia, serif;
+  --body:       'Outfit', system-ui, sans-serif;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: var(--body);
+  color: var(--ink);
+  background: var(--paper);
+  line-height: 1.55;
+  -webkit-font-smoothing: antialiased;
+  min-height: 100vh;
+}
+
+/* subtle grain/texture atmosphere */
+body::before {
+  content: "";
+  position: fixed; inset: 0; z-index: -1;
+  background:
+    radial-gradient(1100px 600px at 85% -10%, rgba(17,128,106,.10), transparent 60%),
+    radial-gradient(900px 500px at -10% 110%, rgba(232,161,58,.10), transparent 55%);
+  pointer-events: none;
+}
+
+h1, h2, h3 { font-family: var(--display); font-weight: 600; line-height: 1.1; letter-spacing: -.01em; }
+
+a { color: var(--emerald-d); text-decoration: none; }
+a:hover { text-decoration: underline; }
+
+/* ---------- layout shells ---------- */
+.wrap { max-width: 1080px; margin: 0 auto; padding: 0 22px; }
+
+.topbar {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 18px 22px; max-width: 1080px; margin: 0 auto;
+}
+.brand { display: flex; align-items: center; gap: 11px; font-family: var(--display);
+  font-weight: 700; font-size: 1.25rem; color: var(--ink); }
+.brand .logo {
+  width: 38px; height: 38px; border-radius: 11px;
+  background: linear-gradient(150deg, var(--emerald), var(--emerald-d));
+  display: grid; place-items: center; color: #fff; font-size: 1.1rem;
+  box-shadow: var(--shadow-sm); transform: rotate(-4deg);
+}
+.brand small { color: var(--amber-d); font-weight: 600; }
+
+/* ---------- buttons ---------- */
+.btn {
+  font-family: var(--body); font-weight: 600; font-size: .98rem;
+  border: none; border-radius: 999px; padding: 13px 24px; cursor: pointer;
+  display: inline-flex; align-items: center; gap: 9px; justify-content: center;
+  transition: transform .15s ease, box-shadow .2s ease, background .2s ease;
+}
+.btn:active { transform: translateY(1px) scale(.99); }
+.btn--primary { background: var(--emerald); color: #fff; box-shadow: var(--shadow-sm); }
+.btn--primary:hover { background: var(--emerald-d); box-shadow: var(--shadow); }
+.btn--amber { background: var(--amber); color: #2a1c05; box-shadow: var(--shadow-sm); }
+.btn--amber:hover { background: var(--amber-d); }
+.btn--ghost { background: transparent; color: var(--ink); border: 1.5px solid var(--line); }
+.btn--ghost:hover { border-color: var(--emerald); color: var(--emerald-d); }
+.btn--block { width: 100%; }
+.btn:disabled { opacity: .55; cursor: not-allowed; transform: none; }
+
+/* ---------- cards ---------- */
+.card {
+  background: var(--paper-2); border: 1px solid var(--line);
+  border-radius: var(--radius); box-shadow: var(--shadow-sm);
+}
+.card--pad { padding: 26px; }
+
+/* ---------- forms ---------- */
+.field { margin-bottom: 16px; }
+.field label { display: block; font-weight: 600; font-size: .9rem; margin-bottom: 7px; color: var(--ink-2); }
+.input, textarea.input, select.input {
+  width: 100%; font-family: var(--body); font-size: 1rem; color: var(--ink);
+  background: var(--paper); border: 1.5px solid var(--line);
+  border-radius: var(--radius-sm); padding: 12px 14px; transition: border .2s, box-shadow .2s;
+}
+.input:focus, textarea.input:focus, select.input:focus {
+  outline: none; border-color: var(--emerald);
+  box-shadow: 0 0 0 4px rgba(17,128,106,.12);
+}
+textarea.input { resize: vertical; min-height: 150px; line-height: 1.6; }
+
+/* ---------- flash messages ---------- */
+.flash { display: none; padding: 11px 14px; border-radius: var(--radius-sm); font-size: .92rem; margin-bottom: 14px; }
+.flash--error   { background: #fbe9e6; color: #9a3528; border: 1px solid #f1c5bd; }
+.flash--success { background: #e6f3ee; color: #0c5f4f; border: 1px solid #b9dccf; }
+.flash--info    { background: #fdf2dd; color: #8a5e12; border: 1px solid #f0d9a6; }
+
+/* ---------- tabs ---------- */
+.tabs { display: flex; gap: 6px; background: var(--paper); padding: 5px; border-radius: 999px; border: 1px solid var(--line); }
+.tab { flex: 1; text-align: center; padding: 9px 14px; border-radius: 999px; font-weight: 600;
+  font-size: .92rem; cursor: pointer; color: var(--muted); border: none; background: transparent; transition: all .2s; }
+.tab.active { background: var(--emerald); color: #fff; box-shadow: var(--shadow-sm); }
+
+/* ---------- misc ---------- */
+.muted { color: var(--muted); }
+.pill { display: inline-block; padding: 4px 11px; border-radius: 999px; font-size: .78rem; font-weight: 600;
+  background: rgba(17,128,106,.1); color: var(--emerald-d); }
+.spinner { width: 18px; height: 18px; border: 2.5px solid rgba(255,255,255,.4);
+  border-top-color: #fff; border-radius: 50%; animation: spin .7s linear infinite; }
+@keyframes spin { to { transform: rotate(360deg); } }
+.center-screen { min-height: 100vh; display: grid; place-items: center; padding: 24px; }
+
+/* staggered entrance */
+.rise { opacity: 0; transform: translateY(14px); animation: rise .55s cubic-bezier(.2,.7,.3,1) forwards; }
+@keyframes rise { to { opacity: 1; transform: none; } }

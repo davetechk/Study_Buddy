@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>JCABSS AI Study Buddy</title>
+<link rel="stylesheet" href="styles.css">
+<style>
+  .auth-split { display: grid; grid-template-columns: 1.05fr .95fr; min-height: 100vh; }
+  .auth-hero {
+    background: linear-gradient(160deg, var(--ink) 0%, var(--ink-2) 55%, var(--emerald-d) 140%);
+    color: var(--paper); padding: 54px 50px; display: flex; flex-direction: column; justify-content: space-between;
+    position: relative; overflow: hidden;
+  }
+  .auth-hero::after {
+    content: ""; position: absolute; width: 420px; height: 420px; right: -120px; bottom: -140px;
+    background: radial-gradient(circle, rgba(232,161,58,.35), transparent 65%); border-radius: 50%;
+  }
+  .auth-hero h1 { font-size: clamp(2.2rem, 4vw, 3.3rem); color: #fff; margin: 18px 0 14px; }
+  .auth-hero h1 em { font-style: italic; color: var(--amber); }
+  .auth-hero p.lead { font-size: 1.1rem; color: #cfe0d9; max-width: 30ch; }
+  .feat { display: flex; gap: 13px; align-items: flex-start; margin-top: 18px; position: relative; z-index: 1; }
+  .feat .ic { width: 34px; height: 34px; border-radius: 9px; background: rgba(255,255,255,.1);
+    display: grid; place-items: center; flex-shrink: 0; font-size: 1rem; }
+  .feat b { color: #fff; } .feat span { color: #b9cdc5; font-size: .92rem; }
+  .auth-hero .brand { color: #fff; position: relative; z-index: 1; }
+
+  .auth-form-side { display: grid; place-items: center; padding: 40px 28px; }
+  .auth-card { width: 100%; max-width: 400px; }
+  .auth-card h2 { font-size: 1.8rem; margin-bottom: 4px; }
+  .auth-toggle { text-align: center; margin-top: 18px; font-size: .94rem; color: var(--muted); }
+  .pw-wrap { position: relative; }
+  .pw-wrap .toggle { position: absolute; right: 12px; top: 50%; transform: translateY(-50%);
+    background: none; border: none; cursor: pointer; color: var(--muted); font-size: .82rem; font-weight: 600; }
+  @media (max-width: 820px) { .auth-split { grid-template-columns: 1fr; } .auth-hero { display: none; } }
+</style>
+</head>
+<body>
+<div class="auth-split">
+  <!-- hero -->
+  <aside class="auth-hero">
+    <div class="brand"><span class="logo">📚</span> JCABSS <small>AI</small></div>
+    <div>
+      <span class="pill" style="background:rgba(232,161,58,.18);color:#f4c578;">Study smarter, not harder</span>
+      <h1>Turn any note into a <em>summary</em> & a <em>quiz</em>.</h1>
+      <p class="lead">Upload your notes. Get the key points. Test yourself until it sticks.</p>
+      <div class="feat"><span class="ic">✨</span><div><b>Instant summaries</b><br><span>Bullet points + one-paragraph recap</span></div></div>
+      <div class="feat"><span class="ic">🎯</span><div><b>Retry-until-correct quizzes</b><br><span>Learn it, don't just guess it</span></div></div>
+      <div class="feat"><span class="ic">📈</span><div><b>Track your accuracy</b><br><span>Watch yourself improve over time</span></div></div>
+    </div>
+    <p style="color:#8fa69d;font-size:.85rem;position:relative;z-index:1;">JCABSS AI Study Buddy</p>
+  </aside>
+
+  <!-- form -->
+  <main class="auth-form-side">
+    <div class="auth-card rise">
+      <div class="brand" style="margin-bottom:22px;display:none;" id="mobileBrand"><span class="logo">📚</span> JCABSS <small>AI</small></div>
+      <h2 id="formTitle">Welcome back</h2>
+      <p class="muted" id="formSub" style="margin-bottom:22px;">Sign in to keep studying.</p>
+
+      <div id="flash" class="flash"></div>
+
+      <div class="field" id="nameField" style="display:none;">
+        <label for="name">Display name <span class="muted" style="font-weight:400;">(optional)</span></label>
+        <input class="input" id="name" type="text" placeholder="e.g. Ada">
+      </div>
+      <div class="field">
+        <label for="email">Email</label>
+        <input class="input" id="email" type="email" placeholder="you@email.com" autocomplete="email">
+      </div>
+      <div class="field">
+        <label for="password">Password</label>
+        <div class="pw-wrap">
+          <input class="input" id="password" type="password" placeholder="••••••••" autocomplete="current-password">
+          <button class="toggle" type="button" id="pwToggle">Show</button>
+        </div>
+      </div>
+
+      <button class="btn btn--primary btn--block" id="submitBtn">Sign In</button>
+
+      <p class="auth-toggle">
+        <span id="toggleText">New here?</span>
+        <a href="#" id="toggleLink"><b>Create an account</b></a>
+      </p>
+    </div>
+  </main>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="js/config.js"></script>
+<script>
+  let mode = "login"; // or "signup"
+
+  const els = {
+    title: $("#formTitle"), sub: $("#formSub"), nameField: $("#nameField"),
+    submit: $("#submitBtn"), toggleText: $("#toggleText"), toggleLink: $("#toggleLink"),
+    flash: $("#flash"), email: $("#email"), password: $("#password"), name: $("#name"),
+  };
+
+  function render() {
+    if (mode === "login") {
+      els.title.textContent = "Welcome back";
+      els.sub.textContent = "Sign in to keep studying.";
+      els.nameField.style.display = "none";
+      els.submit.textContent = "Sign In";
+      els.toggleText.textContent = "New here?";
+      els.toggleLink.innerHTML = "<b>Create an account</b>";
+    } else {
+      els.title.textContent = "Create your account";
+      els.sub.textContent = "Start turning notes into quizzes.";
+      els.nameField.style.display = "block";
+      els.submit.textContent = "Create Account";
+      els.toggleText.textContent = "Already have an account?";
+      els.toggleLink.innerHTML = "<b>Sign in</b>";
+    }
+    flash(els.flash, "");
+  }
+
+  $("#toggleLink").addEventListener("click", (e) => {
+    e.preventDefault(); mode = mode === "login" ? "signup" : "login"; render();
+  });
+
+  $("#pwToggle").addEventListener("click", () => {
+    const p = els.password;
+    p.type = p.type === "password" ? "text" : "password";
+    $("#pwToggle").textContent = p.type === "password" ? "Show" : "Hide";
+  });
+
+  async function submit() {
+    const email = els.email.value.trim();
+    const password = els.password.value;
+    if (!email || !password) { flash(els.flash, "Please enter your email and password."); return; }
+
+    els.submit.disabled = true;
+    const original = els.submit.textContent;
+    els.submit.innerHTML = '<span class="spinner"></span>';
+
+    try {
+      if (mode === "signup") {
+        const { data, error } = await sb.auth.signUp({ email, password });
+        if (error) throw error;
+        // store display name on the profile (created by our DB trigger)
+        const name = els.name.value.trim();
+        if (name && data.user) {
+          await sb.from("profiles").update({ display_name: name }).eq("id", data.user.id);
+        }
+        // If email confirmation is OFF, we get a session immediately.
+        const { data: { session } } = await sb.auth.getSession();
+        if (session) { go("dashboard.html"); return; }
+        flash(els.flash, "Account created! Check your email to confirm, then sign in.", "success");
+        mode = "login"; render();
+      } else {
+        const { error } = await sb.auth.signInWithPassword({ email, password });
+        if (error) throw error;
+        go("dashboard.html");
+      }
+    } catch (err) {
+      flash(els.flash, err.message || "Something went wrong. Please try again.");
+    } finally {
+      els.submit.disabled = false;
+      els.submit.textContent = original;
+    }
+  }
+
+  els.submit.addEventListener("click", submit);
+  els.password.addEventListener("keydown", (e) => { if (e.key === "Enter") submit(); });
+
+  // If already logged in, skip straight to dashboard.
+  (async () => {
+    const { data: { session } } = await sb.auth.getSession();
+    if (session) go("dashboard.html");
+  })();
+
+  render();
+</script>
+</body>
+</html>
