@@ -6,55 +6,35 @@
 <title>Dashboard — JCABSS AI</title>
 <link rel="stylesheet" href="styles.css">
 <style>
-  .shell { display: grid; grid-template-columns: 240px 1fr; min-height: 100vh; }
-  .side {
-    background: var(--ink); color: var(--paper); padding: 24px 18px;
-    display: flex; flex-direction: column; gap: 6px; position: sticky; top: 0; height: 100vh;
-  }
-  .side .brand { color: #fff; margin-bottom: 26px; font-size: 1.1rem; }
-  .nav-link { display: flex; align-items: center; gap: 12px; padding: 12px 14px; border-radius: 12px;
-    color: #b9cdc5; font-weight: 500; cursor: pointer; transition: all .18s; }
-  .nav-link:hover { background: rgba(255,255,255,.07); color: #fff; text-decoration: none; }
-  .nav-link.active { background: var(--emerald); color: #fff; }
-  .nav-link .ic { font-size: 1.1rem; }
-  .side .spacer { flex: 1; }
-  .side .signout { color: #8fa69d; font-size: .9rem; }
-
-  .main { padding: 34px 38px; }
-  .page-head { display: flex; align-items: flex-end; justify-content: space-between; margin-bottom: 26px; flex-wrap: wrap; gap: 14px; }
-  .page-head h1 { font-size: 2rem; }
-  .greet { color: var(--muted); }
-
-  .stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-bottom: 28px; }
-  .stat { padding: 20px 22px; }
-  .stat .n { font-family: var(--display); font-size: 2.3rem; font-weight: 700; color: var(--emerald-d); line-height: 1; }
-  .stat .l { color: var(--muted); font-size: .9rem; margin-top: 6px; }
-
-  .section-title { font-size: 1.3rem; margin-bottom: 14px; }
-  .note-list { display: grid; gap: 12px; }
-  .note-row { display: flex; align-items: center; gap: 16px; padding: 16px 20px; cursor: pointer; transition: transform .15s, box-shadow .2s; }
-  .note-row:hover { transform: translateX(4px); box-shadow: var(--shadow); }
-  .note-row .ic { width: 44px; height: 44px; border-radius: 12px; background: rgba(17,128,106,.12);
-    display: grid; place-items: center; font-size: 1.3rem; flex-shrink: 0; }
-  .note-row .body { flex: 1; min-width: 0; }
-  .note-row .body b { display: block; font-size: 1.02rem; }
-  .note-row .body span { color: var(--muted); font-size: .88rem; display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-  .note-row .date { color: var(--muted); font-size: .82rem; flex-shrink: 0; }
-
-  .empty { text-align: center; padding: 50px 20px; color: var(--muted); }
-  .empty .big { font-size: 2.6rem; margin-bottom: 10px; }
-
-  @media (max-width: 760px) {
-    .shell { grid-template-columns: 1fr; }
-    .side { position: static; height: auto; flex-direction: row; flex-wrap: wrap; align-items: center; }
-    .side .brand { margin: 0 14px 0 0; } .side .spacer { display: none; }
-    .stats { grid-template-columns: 1fr; } .main { padding: 22px; }
-  }
+  .shell { display:grid; grid-template-columns:240px 1fr; min-height:100vh; }
+  .side { background:var(--ink); color:var(--paper); padding:24px 18px; display:flex; flex-direction:column; gap:6px; position:sticky; top:0; height:100vh; }
+  .side .brand { color:#fff; margin-bottom:26px; font-size:1.1rem; }
+  .nav-link { display:flex; align-items:center; gap:12px; padding:12px 14px; border-radius:12px; color:#b9cdc5; font-weight:500; cursor:pointer; transition:all .18s; }
+  .nav-link:hover { background:rgba(255,255,255,.07); color:#fff; text-decoration:none; }
+  .nav-link.active { background:var(--emerald); color:#fff; }
+  .nav-link .ic { font-size:1.1rem; }
+  .side .spacer { flex:1; } .side .signout { color:#8fa69d; font-size:.9rem; }
+  .badge-role { font-size:.72rem; padding:3px 9px; border-radius:999px; background:rgba(232,161,58,.2); color:#f4c578; margin-top:4px; display:inline-block; }
+  .main { padding:34px 38px; }
+  .page-head { display:flex; align-items:flex-end; justify-content:space-between; margin-bottom:26px; flex-wrap:wrap; gap:14px; }
+  .page-head h1 { font-size:2rem; } .greet { color:var(--muted); }
+  .stats { display:grid; grid-template-columns:repeat(3,1fr); gap:16px; margin-bottom:28px; }
+  .stat { padding:20px 22px; } .stat .n { font-family:var(--display); font-size:2.3rem; font-weight:700; color:var(--emerald-d); line-height:1; }
+  .stat .l { color:var(--muted); font-size:.9rem; margin-top:6px; }
+  .section-title { font-size:1.3rem; margin-bottom:14px; }
+  .note-list { display:grid; gap:12px; }
+  .note-row { display:flex; align-items:center; gap:16px; padding:16px 20px; cursor:pointer; transition:transform .15s, box-shadow .2s; }
+  .note-row:hover { transform:translateX(4px); box-shadow:var(--shadow); }
+  .note-row .ic { width:44px; height:44px; border-radius:12px; background:rgba(17,128,106,.12); display:grid; place-items:center; font-size:1.3rem; flex-shrink:0; }
+  .note-row .body { flex:1; min-width:0; } .note-row .body b { display:block; font-size:1.02rem; }
+  .note-row .body span { color:var(--muted); font-size:.88rem; display:block; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+  .note-row .date { color:var(--muted); font-size:.82rem; flex-shrink:0; }
+  .empty { text-align:center; padding:50px 20px; color:var(--muted); } .empty .big { font-size:2.6rem; margin-bottom:10px; }
+  @media (max-width:760px){ .shell{grid-template-columns:1fr;} .side{position:static;height:auto;flex-direction:row;flex-wrap:wrap;align-items:center;} .side .brand{margin:0 14px 0 0;} .side .spacer{display:none;} .stats{grid-template-columns:1fr;} .main{padding:22px;} }
 </style>
 </head>
 <body>
 <div class="shell">
-  <!-- sidebar -->
   <nav class="side">
     <div class="brand"><span class="logo">📚</span> JCABSS <small>AI</small></div>
     <a class="nav-link active"><span class="ic">🏠</span> Dashboard</a>
@@ -62,23 +42,20 @@
     <div class="spacer"></div>
     <a class="nav-link signout" id="signout"><span class="ic">↩︎</span> Sign Out</a>
   </nav>
-
-  <!-- main -->
   <main class="main">
     <div class="page-head rise">
       <div>
         <h1>Dashboard</h1>
         <p class="greet" id="greet">Loading…</p>
+        <span id="roleBadge"></span>
       </div>
       <a class="btn btn--amber" href="upload.html">➕ Create New Note</a>
     </div>
-
     <div class="stats rise" style="animation-delay:.05s">
       <div class="card stat"><div class="n" id="statNotes">0</div><div class="l">Notes created</div></div>
       <div class="card stat"><div class="n" id="statQuizzes">0</div><div class="l">Quizzes taken</div></div>
       <div class="card stat"><div class="n" id="statAcc">—</div><div class="l">Avg. accuracy</div></div>
     </div>
-
     <h2 class="section-title rise" style="animation-delay:.1s">Recent notes</h2>
     <div id="noteList" class="note-list rise" style="animation-delay:.12s"></div>
   </main>
@@ -86,67 +63,46 @@
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="js/config.js"></script>
+<script src="js/session.js"></script>
 <script>
-  let user = null;
+  function escapeHtml(s){ return (s||"").replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])); }
+  $("#signout").addEventListener("click", logoutLearner);
 
-  $("#signout").addEventListener("click", async () => {
-    await sb.auth.signOut(); go("index.html");
-  });
+  async function load(){
+    const learner = await requireLearner(); if(!learner) return;
 
-  async function load() {
-    user = await requireAuth();
-    if (!user) return;
-
-    // greeting (use display name if set)
-    const { data: prof } = await sb.from("profiles").select("display_name").eq("id", user.id).single();
-    const name = (prof && prof.display_name) ? prof.display_name : (user.email || "there").split("@")[0];
+    // greeting
+    let name = learner.name || "there";
+    if(learner.type==="visitor"){
+      const { data: prof } = await sb.from("profiles").select("display_name").eq("id", learner.id).maybeSingle();
+      if(prof && prof.display_name) name = prof.display_name;
+    }
     $("#greet").textContent = "Welcome back, " + name + " 👋";
+    if(learner.type==="student"){
+      $("#roleBadge").innerHTML = `<span class="badge-role">${escapeHtml(learner.schoolName||"School")} · ${escapeHtml(learner.role||"Student")}</span>`;
+    }
 
-    // notes
-    const { data: notes } = await sb.from("notes")
-      .select("id,title,summary,created_at")
-      .eq("learner_type", "visitor").eq("learner_id", user.id)
-      .order("created_at", { ascending: false });
+    const notes = await dataListNotes(learner);
+    const quizzes = await dataListQuizzes(learner);
 
-    // quizzes
-    const { data: quizzes } = await sb.from("quizzes")
-      .select("accuracy,completed")
-      .eq("learner_type", "visitor").eq("learner_id", user.id);
-
-    const noteArr = notes || [], quizArr = quizzes || [];
-    $("#statNotes").textContent = noteArr.length;
-    const done = quizArr.filter(q => q.completed);
+    $("#statNotes").textContent = notes.length;
+    const done = quizzes.filter(q=>q.completed);
     $("#statQuizzes").textContent = done.length;
-    if (done.length) {
-      const avg = Math.round(done.reduce((s,q)=>s+(q.accuracy||0),0)/done.length);
-      $("#statAcc").textContent = avg + "%";
-    }
+    if(done.length){ $("#statAcc").textContent = Math.round(done.reduce((s,q)=>s+(q.accuracy||0),0)/done.length)+"%"; }
 
-    // render note list
-    const list = $("#noteList");
-    if (!noteArr.length) {
-      list.innerHTML = `<div class="card empty">
-        <div class="big">📝</div>
-        <p>No notes yet. Create your first one and watch the AI summarise it.</p>
-        <p style="margin-top:14px;"><a class="btn btn--primary" href="upload.html">➕ Create a note</a></p>
-      </div>`;
-      return;
+    const list=$("#noteList");
+    if(!notes.length){
+      list.innerHTML=`<div class="card empty"><div class="big">📝</div><p>No notes yet. Create your first one and watch the AI summarise it.</p><p style="margin-top:14px;"><a class="btn btn--primary" href="upload.html">➕ Create a note</a></p></div>`; return;
     }
-    list.innerHTML = "";
-    noteArr.slice(0, 8).forEach(n => {
-      const row = document.createElement("div");
-      row.className = "card note-row";
-      const preview = (n.summary || "Processing…").replace(/\n/g," ").slice(0, 90);
-      row.innerHTML = `<div class="ic">📄</div>
-        <div class="body"><b>${escapeHtml(n.title)}</b><span>${escapeHtml(preview)}</span></div>
-        <div class="date">${niceDate(n.created_at)}</div>`;
-      row.addEventListener("click", () => go("note.html?id=" + n.id));
+    list.innerHTML="";
+    notes.slice(0,8).forEach(n=>{
+      const row=document.createElement("div"); row.className="card note-row";
+      const preview=(n.summary||"Processing…").replace(/\n/g," ").slice(0,90);
+      row.innerHTML=`<div class="ic">📄</div><div class="body"><b>${escapeHtml(n.title)}</b><span>${escapeHtml(preview)}</span></div><div class="date">${niceDate(n.created_at)}</div>`;
+      row.addEventListener("click",()=>go("note.html?id="+n.id));
       list.appendChild(row);
     });
   }
-
-  function escapeHtml(s){ return (s||"").replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])); }
-
   load();
 </script>
 </body>

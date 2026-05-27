@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin — JCABSS AI</title>
+<link rel="stylesheet" href="styles.css">
+<script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
+<style>
+  .shell { display:grid; grid-template-columns:240px 1fr; min-height:100vh; }
+  .side { background:var(--ink); color:var(--paper); padding:24px 18px; display:flex; flex-direction:column; gap:6px; position:sticky; top:0; height:100vh; }
+  .side .brand { color:#fff; margin-bottom:8px; font-size:1.1rem; } .side .tag { color:#f4c578; font-size:.75rem; margin-bottom:20px; }
+  .nav-link { display:flex; align-items:center; gap:12px; padding:12px 14px; border-radius:12px; color:#b9cdc5; font-weight:500; cursor:pointer; transition:all .18s; }
+  .nav-link:hover { background:rgba(255,255,255,.07); color:#fff; } .nav-link.active { background:var(--emerald); color:#fff; }
+  .side .spacer { flex:1; } .side .signout { color:#8fa69d; font-size:.9rem; }
+  .main { padding:34px 38px; max-width:1000px; }
+  .main h1 { font-size:2rem; margin-bottom:4px; }
+  .panel { padding:24px; margin-bottom:20px; } .panel h3 { font-size:1.2rem; margin-bottom:14px; }
+  .row { display:flex; gap:12px; flex-wrap:wrap; align-items:flex-end; }
+  .row .field { flex:1; min-width:180px; margin-bottom:0; }
+  .school-item { display:flex; align-items:center; justify-content:space-between; padding:14px 18px; border:1px solid var(--line); border-radius:12px; margin-bottom:10px; cursor:pointer; transition:all .15s; }
+  .school-item:hover { border-color:var(--emerald); } .school-item.sel { border-color:var(--emerald); background:rgba(17,128,106,.06); }
+  .school-item b { display:block; } .school-item span { color:var(--muted); font-size:.85rem; }
+  .seg { display:flex; gap:6px; background:var(--paper); padding:5px; border-radius:12px; border:1px solid var(--line); margin-bottom:14px; }
+  .seg button { flex:1; padding:9px; border:none; background:transparent; border-radius:9px; font-family:var(--body); font-weight:600; color:var(--muted); cursor:pointer; }
+  .seg button.active { background:var(--emerald); color:#fff; }
+  .result-box { margin-top:16px; padding:18px; border-radius:12px; background:rgba(17,128,106,.07); border:1px solid #b9dccf; }
+  .result-box table { width:100%; border-collapse:collapse; margin-top:10px; font-size:.9rem; }
+  .result-box th, .result-box td { text-align:left; padding:7px 10px; border-bottom:1px solid var(--line); }
+  .result-box th { color:var(--emerald-d); }
+  .gate { min-height:100vh; display:grid; place-items:center; padding:24px; text-align:center; }
+  @media (max-width:760px){ .shell{grid-template-columns:1fr;} .side{position:static;height:auto;} .main{padding:22px;} }
+</style>
+</head>
+<body>
+<!-- gate shown until admin verified -->
+<div id="gate" class="gate">
+  <div class="card card--pad" style="max-width:420px;">
+    <div class="brand" style="justify-content:center;margin-bottom:16px;"><span class="logo">📚</span> JCABSS <small>AI</small></div>
+    <h2 style="font-size:1.5rem;">Admin area</h2>
+    <p class="muted" id="gateMsg" style="margin:10px 0 18px;">Checking your access…</p>
+    <a class="btn btn--primary" href="index.html" id="gateBtn" style="display:none;">Go to login</a>
+  </div>
+</div>
+
+<div class="shell" id="app" style="display:none;">
+  <nav class="side">
+    <div class="brand"><span class="logo">📚</span> JCABSS</div>
+    <div class="tag">ADMIN</div>
+    <a class="nav-link active"><span class="ic">🏫</span> Schools & Students</a>
+    <div class="spacer"></div>
+    <a class="nav-link signout" id="signout"><span class="ic">↩︎</span> Sign Out</a>
+  </nav>
+  <main class="main">
+    <h1 class="rise">Schools & Students</h1>
+    <p class="muted rise" style="margin-bottom:22px;">Onboard schools and bulk-create student logins.</p>
+    <div id="flash" class="flash"></div>
+
+    <!-- create school -->
+    <div class="card panel rise">
+      <h3>➕ Add a school</h3>
+      <div class="row">
+        <div class="field"><label>School name</label><input class="input" id="schoolName" placeholder="e.g. Government College Lagos"></div>
+        <div class="field"><label>Short code</label><input class="input" id="schoolCode" placeholder="e.g. GCL"></div>
+        <button class="btn btn--primary" id="addSchoolBtn">Create</button>
+      </div>
+    </div>
+
+    <!-- schools list -->
+    <div class="card panel rise">
+      <h3>🏫 Your schools</h3>
+      <div id="schoolList"><p class="muted">Loading…</p></div>
+    </div>
+
+    <!-- bulk import -->
+    <div class="card panel rise" id="importPanel" style="display:none;">
+      <h3>👥 Add students to <span id="importSchoolName" style="color:var(--emerald-d);"></span></h3>
+      <div class="seg">
+        <button id="segPaste" class="active">Paste names</button>
+        <button id="segCsv">Upload CSV</button>
+      </div>
+      <div id="pasteMode">
+        <div class="field"><label>One name per line</label><textarea class="input" id="namesText" placeholder="Ada Obi&#10;Chidi Eze&#10;Ngozi Bello"></textarea></div>
+      </div>
+      <div id="csvMode" style="display:none;">
+        <div class="field"><label>CSV file (first column = names, header optional)</label><input class="input" id="csvFile" type="file" accept=".csv,text/csv"></div>
+      </div>
+      <div class="field"><label>Class <span class="muted" style="font-weight:400;">(optional, applies to all)</span></label><input class="input" id="klass" placeholder="e.g. SS2"></div>
+      <button class="btn btn--amber" id="importBtn">Generate logins</button>
+
+      <div id="resultBox" style="display:none;" class="result-box">
+        <b id="resultSummary"></b>
+        <div style="margin:12px 0;">
+          <button class="btn btn--primary" id="dlCsv">⬇ Download CSV</button>
+          <button class="btn btn--ghost" id="dlPdf">⬇ Download PDF</button>
+        </div>
+        <div style="max-height:260px;overflow:auto;"><table id="resultTable"></table></div>
+        <p class="muted" style="margin-top:10px;font-size:.85rem;">⚠️ This is the only time these passwords are shown. Download and keep them safe before leaving this page.</p>
+      </div>
+    </div>
+  </main>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="js/config.js"></script>
+<script src="js/session.js"></script>
+<script>
+  let selectedSchool=null, lastCreated=[];
+  function escapeHtml(s){ return (s||"").replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])); }
+
+  async function admin(action, payload={}){
+    const { data, error } = await sb.functions.invoke("admin-actions", { body:{ action, payload } });
+    if(error) throw new Error(error.message||"Request failed");
+    if(data && data.error) throw new Error(data.error);
+    return data;
+  }
+
+  // ---- gate: must be a logged-in admin ----
+  async function checkAdmin(){
+    const { data:{ session } } = await sb.auth.getSession();
+    if(!session){ $("#gateMsg").textContent="You must be logged in as the admin."; $("#gateBtn").style.display="inline-flex"; return; }
+    const { data: prof } = await sb.from("profiles").select("role").eq("id", session.user.id).maybeSingle();
+    if(!prof || prof.role!=="admin"){ $("#gateMsg").textContent="This account is not an admin."; $("#gateBtn").style.display="inline-flex"; return; }
+    $("#gate").style.display="none"; $("#app").style.display="grid";
+    loadSchools();
+  }
+
+  $("#signout").addEventListener("click", logoutLearner);
+
+  // ---- create school ----
+  $("#addSchoolBtn").addEventListener("click", async ()=>{
+    const name=$("#schoolName").value.trim(), code=$("#schoolCode").value.trim();
+    if(!name||!code){ flash($("#flash"),"School name and code required."); return; }
+    const btn=$("#addSchoolBtn"); btn.disabled=true;
+    try{ await admin("create_school",{name,code}); $("#schoolName").value=""; $("#schoolCode").value=""; flash($("#flash"),"School created.","success"); loadSchools(); }
+    catch(e){ flash($("#flash"), e.message); } finally{ btn.disabled=false; }
+  });
+
+  // ---- list schools ----
+  async function loadSchools(){
+    try{
+      const { schools } = await admin("list_schools");
+      const list=$("#schoolList");
+      if(!schools.length){ list.innerHTML='<p class="muted">No schools yet. Add one above.</p>'; return; }
+      list.innerHTML="";
+      schools.forEach(s=>{
+        const el=document.createElement("div"); el.className="school-item"+(selectedSchool&&selectedSchool.id===s.id?" sel":"");
+        el.innerHTML=`<div><b>${escapeHtml(s.name)}</b><span>Code: ${escapeHtml(s.code)} · ${s.student_count} students</span></div><span class="pill">Manage →</span>`;
+        el.addEventListener("click",()=>selectSchool(s));
+        list.appendChild(el);
+      });
+    }catch(e){ flash($("#flash"), e.message); }
+  }
+
+  function selectSchool(s){
+    selectedSchool=s; loadSchools();
+    $("#importPanel").style.display="block";
+    $("#importSchoolName").textContent=s.name;
+    $("#resultBox").style.display="none";
+    $("#importPanel").scrollIntoView({behavior:"smooth"});
+  }
+
+  // ---- import mode toggle ----
+  $("#segPaste").addEventListener("click",()=>{ $("#segPaste").classList.add("active"); $("#segCsv").classList.remove("active"); $("#pasteMode").style.display="block"; $("#csvMode").style.display="none"; });
+  $("#segCsv").addEventListener("click",()=>{ $("#segCsv").classList.add("active"); $("#segPaste").classList.remove("active"); $("#csvMode").style.display="block"; $("#pasteMode").style.display="none"; });
+
+  function parseCsv(text){
+    return text.split(/\r?\n/).map(line=>{
+      const first=line.split(",")[0].trim().replace(/^["']|["']$/g,"");
+      return first;
+    }).filter(Boolean).filter((n,i)=>!(i===0 && /name/i.test(n))); // drop header if "name"
+  }
+
+  // ---- run import ----
+  $("#importBtn").addEventListener("click", async ()=>{
+    if(!selectedSchool){ flash($("#flash"),"Select a school first."); return; }
+    let names=[];
+    if($("#segCsv").classList.contains("active")){
+      const f=$("#csvFile").files[0];
+      if(!f){ flash($("#flash"),"Choose a CSV file."); return; }
+      names=parseCsv(await f.text());
+    } else {
+      names=$("#namesText").value.split("\n").map(s=>s.trim()).filter(Boolean);
+    }
+    if(!names.length){ flash($("#flash"),"No names found."); return; }
+    const klass=$("#klass").value.trim()||null;
+    const btn=$("#importBtn"); btn.disabled=true; const o=btn.textContent; btn.innerHTML='<span class="spinner"></span> Creating…';
+    try{
+      const res=await admin("bulk_create_students",{ schoolId:selectedSchool.id, names, klass });
+      lastCreated=res.created;
+      $("#resultSummary").textContent=`Created ${res.createdCount} new logins`+(res.skippedCount?`, skipped ${res.skippedCount} (already existed)`:"")+".";
+      const t=$("#resultTable");
+      t.innerHTML="<tr><th>Name</th><th>Password</th></tr>"+res.created.map(c=>`<tr><td>${escapeHtml(c.name)}</td><td><code>${escapeHtml(c.password)}</code></td></tr>`).join("");
+      $("#resultBox").style.display="block";
+      flash($("#flash"),"");
+      loadSchools();
+    }catch(e){ flash($("#flash"), e.message); }
+    finally{ btn.disabled=false; btn.textContent=o; }
+  });
+
+  // ---- downloads ----
+  $("#dlCsv").addEventListener("click",()=>{
+    const rows=[["Name","Password","School"]].concat(lastCreated.map(c=>[c.name,c.password,selectedSchool.name]));
+    const csv=rows.map(r=>r.map(v=>`"${String(v).replace(/"/g,'""')}"`).join(",")).join("\n");
+    const blob=new Blob([csv],{type:"text/csv"}); const a=document.createElement("a");
+    a.href=URL.createObjectURL(blob); a.download=`${selectedSchool.code}-logins.csv`; a.click();
+  });
+  $("#dlPdf").addEventListener("click",()=>{
+    const { jsPDF }=window.jspdf; const doc=new jsPDF();
+    doc.setFontSize(16); doc.text("JCABSS AI — Student Logins",14,18);
+    doc.setFontSize(11); doc.text(`School: ${selectedSchool.name}  (${selectedSchool.code})`,14,27);
+    doc.setFontSize(9); doc.text("Keep this safe. Each student logs in with their name + password.",14,34);
+    let y=46; doc.setFontSize(11); doc.setFont(undefined,"bold");
+    doc.text("Name",14,y); doc.text("Password",120,y); doc.setFont(undefined,"normal"); y+=4;
+    doc.line(14,y,196,y); y+=8;
+    lastCreated.forEach(c=>{
+      if(y>280){ doc.addPage(); y=20; }
+      doc.text(String(c.name).slice(0,55),14,y); doc.text(String(c.password),120,y); y+=8;
+    });
+    doc.save(`${selectedSchool.code}-logins.pdf`);
+  });
+
+  checkAdmin();
+</script>
+</body>
+</html>

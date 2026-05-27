@@ -1,43 +1,41 @@
 // ============================================================================
-//  ai.js — PLACEHOLDER AI
-//  Right now these return fake-but-sensible content so we can prove the whole
-//  app flow works. LATER, these two functions will call a Supabase Edge
-//  Function that talks to OpenAI. Nothing else in the app changes — only this.
+//  ai.js — REAL AI (via Supabase Edge Function "ai-generate" → Gemini)
+//  Same function names and return shapes as the placeholder version, so
+//  nothing else in the app changes. To switch AI providers later, you only
+//  change the Edge Function — not this file.
 // ============================================================================
 
-// Fake "summary + bullet points" from note text.
 async function aiSummarize(content) {
-  await fakeDelay();
-  const firstLine = (content.trim().split("\n")[0] || "your notes").slice(0, 80);
+  const { data, error } = await sb.functions.invoke("ai-generate", {
+    body: { action: "summary", content }
+  });
+  if (error) throw new Error(humanError(error));
+  if (data && data.error) throw new Error(data.error);
   return {
-    summary:
-      "This is a placeholder summary. Once real AI is connected, this paragraph " +
-      "will be a clear, concise overview of your note about \u201C" + firstLine + "\u201D, " +
-      "written to help you understand it faster than reading the original.",
-    bulletPoints: [
-      "- Key point one will appear here once AI is connected",
-      "- Key point two: the main idea of your note",
-      "- Key point three: an important detail to remember",
-      "- Key point four: something to focus on",
-      "- Key point five: a final takeaway"
-    ].join("\n")
+    summary: data.summary || "Could not generate summary.",
+    bulletPoints: data.bulletPoints || "- Could not generate bullet points."
   };
 }
 
-// Fake multiple-choice questions from note text.
 async function aiQuiz(content, count = 5) {
-  await fakeDelay();
-  const qs = [];
-  for (let i = 1; i <= count; i++) {
-    qs.push({
-      question: "Placeholder question " + i + ": which option is correct? (real questions come once AI is wired up)",
-      options: ["Option A", "Option B (correct)", "Option C", "Option D"],
-      correctAnswer: 1
-    });
-  }
-  return qs;
+  const { data, error } = await sb.functions.invoke("ai-generate", {
+    body: { action: "quiz", content, count }
+  });
+  if (error) throw new Error(humanError(error));
+  if (data && data.error) throw new Error(data.error);
+  const qs = Array.isArray(data.questions) ? data.questions : [];
+  return qs.filter(q =>
+    q && typeof q.question === "string" &&
+    Array.isArray(q.options) && q.options.length >= 2 &&
+    Number.isInteger(q.correctAnswer)
+  );
 }
 
-function fakeDelay() {
-  return new Promise(r => setTimeout(r, 700)); // mimics a real API call
+function humanError(error) {
+  try {
+    if (error.context && error.context.status) {
+      return "AI service error (" + error.context.status + "). Check the function logs.";
+    }
+  } catch (e) {}
+  return error.message || "AI service is unavailable right now.";
 }

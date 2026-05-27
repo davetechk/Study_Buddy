@@ -6,13 +6,9 @@
 <title>New Note — JCABSS AI</title>
 <link rel="stylesheet" href="styles.css">
 <style>
-  .top { display:flex; align-items:center; justify-content:space-between; }
-  .back { color: var(--muted); font-weight:600; cursor:pointer; }
-  .back:hover { color: var(--emerald-d); }
-  .upload-wrap { max-width: 720px; margin: 0 auto; padding: 30px 22px 60px; }
-  .upload-wrap h1 { font-size: 2rem; margin-bottom: 6px; }
-  .note-hint { background: rgba(232,161,58,.12); border:1px solid #f0d9a6; color:#8a5e12;
-    padding: 11px 14px; border-radius: 12px; font-size:.9rem; margin: 16px 0 22px; }
+  .back { color:var(--muted); font-weight:600; cursor:pointer; } .back:hover{ color:var(--emerald-d); }
+  .upload-wrap { max-width:720px; margin:0 auto; padding:30px 22px 60px; }
+  .upload-wrap h1 { font-size:2rem; margin-bottom:6px; }
 </style>
 </head>
 <body>
@@ -20,79 +16,36 @@
   <div class="brand"><span class="logo">📚</span> JCABSS <small>AI</small></div>
   <a class="back" href="dashboard.html">← Back to dashboard</a>
 </div>
-
 <main class="upload-wrap">
   <h1 class="rise">Create a new note</h1>
   <p class="muted rise">Paste or type your study material — the AI will summarise it and build a quiz.</p>
-
-  <div class="note-hint rise">⚙️ AI is in placeholder mode right now, so the summary & quiz are sample content. We'll wire up the real AI next.</div>
-
-  <div id="flash" class="flash"></div>
-
-  <div class="card card--pad rise" style="animation-delay:.05s">
-    <div class="field">
-      <label for="title">Note title</label>
-      <input class="input" id="title" type="text" placeholder="e.g. Biology — Photosynthesis">
-    </div>
-    <div class="field">
-      <label for="subject">Subject <span class="muted" style="font-weight:400;">(optional)</span></label>
-      <input class="input" id="subject" type="text" placeholder="e.g. Biology">
-    </div>
-    <div class="field">
-      <label for="content">Your notes</label>
-      <textarea class="input" id="content" placeholder="Paste your lesson notes, textbook passage, or anything you want to study…"></textarea>
-    </div>
+  <div id="flash" class="flash" style="margin-top:16px;"></div>
+  <div class="card card--pad rise" style="animation-delay:.05s;margin-top:8px;">
+    <div class="field"><label for="title">Note title</label><input class="input" id="title" type="text" placeholder="e.g. Biology — Photosynthesis"></div>
+    <div class="field"><label for="subject">Subject <span class="muted" style="font-weight:400;">(optional)</span></label><input class="input" id="subject" type="text" placeholder="e.g. Biology"></div>
+    <div class="field"><label for="content">Your notes</label><textarea class="input" id="content" placeholder="Paste your lesson notes, textbook passage, or anything you want to study…"></textarea></div>
     <button class="btn btn--primary btn--block" id="createBtn">✨ Create Note & Generate Summary</button>
   </div>
 </main>
-
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="js/config.js"></script>
+<script src="js/session.js"></script>
 <script src="js/ai.js"></script>
 <script>
-  let user = null;
-  (async () => { user = await requireAuth(); })();
-
-  const btn = $("#createBtn");
-  btn.addEventListener("click", async () => {
-    const title = $("#title").value.trim();
-    const subject = $("#subject").value.trim() || null;
-    const content = $("#content").value.trim();
-    const flashEl = $("#flash");
-
-    if (!title) { flash(flashEl, "Please give your note a title."); return; }
-    if (!content) { flash(flashEl, "Please add some notes to summarise."); return; }
-
-    btn.disabled = true;
-    const orig = btn.textContent;
-    btn.innerHTML = '<span class="spinner"></span> Generating…';
-
-    try {
-      // 1) placeholder AI summary
+  let learner=null;
+  (async()=>{ learner=await requireLearner(); })();
+  const btn=$("#createBtn");
+  btn.addEventListener("click", async ()=>{
+    const title=$("#title").value.trim(), subject=$("#subject").value.trim()||null, content=$("#content").value.trim();
+    const flashEl=$("#flash");
+    if(!title){ flash(flashEl,"Please give your note a title."); return; }
+    if(!content){ flash(flashEl,"Please add some notes to summarise."); return; }
+    btn.disabled=true; const o=btn.textContent; btn.innerHTML='<span class="spinner"></span> Generating…';
+    try{
       const ai = await aiSummarize(content);
-
-      // 2) save the note to the database
-      const { data, error } = await sb.from("notes").insert({
-        learner_id: user.id,
-        learner_type: "visitor",
-        title, subject,
-        original_content: content,
-        summary: ai.summary,
-        bullet_points: ai.bulletPoints
-      }).select().single();
-
-      if (error) throw error;
-
-      // 3) log activity (optional, ignore errors)
-      sb.from("activity_log").insert({
-        actor_id: user.id, actor_type: "visitor", action: "note_created"
-      }).then(()=>{}, ()=>{});
-
-      go("note.html?id=" + data.id);
-    } catch (err) {
-      flash(flashEl, err.message || "Could not create the note. Please try again.");
-      btn.disabled = false; btn.textContent = orig;
-    }
+      const note = await dataCreateNote(learner, { title, subject, content, summary: ai.summary, bulletPoints: ai.bulletPoints });
+      go("note.html?id="+note.id);
+    }catch(err){ flash(flashEl, err.message||"Could not create the note."); btn.disabled=false; btn.textContent=o; }
   });
 </script>
 </body>

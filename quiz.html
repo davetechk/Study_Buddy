@@ -6,158 +6,95 @@
 <title>Quiz — JCABSS AI</title>
 <link rel="stylesheet" href="styles.css">
 <style>
-  .quiz-wrap { max-width: 680px; margin: 0 auto; padding: 22px 22px 60px; }
-  .quiz-top { display:flex; align-items:center; justify-content:space-between; margin-bottom: 18px; }
-  .exit { color: var(--muted); font-weight:600; cursor:pointer; background:none; border:none; font-family:var(--body); }
-  .counter { font-weight:700; color: var(--emerald-d); }
-  .progress { height: 8px; background: var(--line); border-radius: 999px; overflow:hidden; margin-bottom: 26px; }
-  .progress .bar { height:100%; background: linear-gradient(90deg, var(--emerald-l), var(--emerald)); width:0; transition: width .4s ease; }
-
-  .q-card { padding: 30px 28px; }
-  .q-text { font-family: var(--display); font-size: 1.5rem; font-weight: 600; line-height: 1.3; margin-bottom: 22px; }
-  .opts { display:grid; gap: 12px; }
-  .opt { text-align:left; padding: 16px 18px; border-radius: 14px; border: 2px solid var(--line);
-    background: var(--paper-2); font-family: var(--body); font-size: 1.02rem; cursor:pointer;
-    transition: all .15s; display:flex; align-items:center; gap: 12px; color: var(--ink); }
-  .opt:hover:not(:disabled) { border-color: var(--emerald-l); transform: translateX(3px); }
-  .opt .key { width: 28px; height: 28px; border-radius: 8px; background: rgba(17,128,106,.1);
-    display:grid; place-items:center; font-weight:700; font-size:.85rem; color: var(--emerald-d); flex-shrink:0; }
-  .opt.correct { border-color: var(--emerald); background: rgba(17,128,106,.12); }
-  .opt.correct .key { background: var(--emerald); color:#fff; }
-  .opt.wrong { border-color: var(--rose); background: rgba(212,96,79,.1); animation: shake .4s; }
-  .opt.wrong .key { background: var(--rose); color:#fff; }
+  .quiz-wrap { max-width:680px; margin:0 auto; padding:22px 22px 60px; }
+  .quiz-top { display:flex; align-items:center; justify-content:space-between; margin-bottom:18px; }
+  .exit { color:var(--muted); font-weight:600; cursor:pointer; background:none; border:none; font-family:var(--body); }
+  .counter { font-weight:700; color:var(--emerald-d); }
+  .progress { height:8px; background:var(--line); border-radius:999px; overflow:hidden; margin-bottom:26px; }
+  .progress .bar { height:100%; background:linear-gradient(90deg,var(--emerald-l),var(--emerald)); width:0; transition:width .4s ease; }
+  .q-card { padding:30px 28px; }
+  .q-text { font-family:var(--display); font-size:1.5rem; font-weight:600; line-height:1.3; margin-bottom:22px; }
+  .opts { display:grid; gap:12px; }
+  .opt { text-align:left; padding:16px 18px; border-radius:14px; border:2px solid var(--line); background:var(--paper-2); font-family:var(--body); font-size:1.02rem; cursor:pointer; transition:all .15s; display:flex; align-items:center; gap:12px; color:var(--ink); }
+  .opt:hover:not(:disabled) { border-color:var(--emerald-l); transform:translateX(3px); }
+  .opt .key { width:28px; height:28px; border-radius:8px; background:rgba(17,128,106,.1); display:grid; place-items:center; font-weight:700; font-size:.85rem; color:var(--emerald-d); flex-shrink:0; }
+  .opt.correct { border-color:var(--emerald); background:rgba(17,128,106,.12); } .opt.correct .key { background:var(--emerald); color:#fff; }
+  .opt.wrong { border-color:var(--rose); background:rgba(212,96,79,.1); animation:shake .4s; } .opt.wrong .key { background:var(--rose); color:#fff; }
   @keyframes shake { 0%,100%{transform:translateX(0)} 20%,60%{transform:translateX(-6px)} 40%,80%{transform:translateX(6px)} }
-  .feedback { margin-top: 16px; font-weight: 600; min-height: 24px; }
-  .feedback.ok { color: var(--emerald-d); } .feedback.no { color: var(--rose); }
-
-  /* completion */
-  .done { text-align:center; padding: 50px 30px; }
-  .done .trophy { font-size: 4rem; animation: bob 1.4s ease-in-out infinite; }
+  .feedback { margin-top:16px; font-weight:600; min-height:24px; } .feedback.ok{color:var(--emerald-d);} .feedback.no{color:var(--rose);}
+  .done { text-align:center; padding:50px 30px; } .done .trophy { font-size:4rem; animation:bob 1.4s ease-in-out infinite; }
   @keyframes bob { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-10px)} }
-  .done h1 { font-size: 2.2rem; margin: 10px 0; }
-  .done .scores { display:flex; gap: 16px; justify-content:center; margin: 24px 0; flex-wrap:wrap; }
-  .done .scorebox { padding: 18px 26px; }
-  .done .scorebox .n { font-family:var(--display); font-size: 2.4rem; font-weight:700; color: var(--emerald-d); }
-  .done .scorebox .l { color: var(--muted); font-size:.86rem; }
+  .done h1 { font-size:2.2rem; margin:10px 0; } .done .scores { display:flex; gap:16px; justify-content:center; margin:24px 0; flex-wrap:wrap; }
+  .done .scorebox { padding:18px 26px; } .done .scorebox .n { font-family:var(--display); font-size:2.4rem; font-weight:700; color:var(--emerald-d); } .done .scorebox .l { color:var(--muted); font-size:.86rem; }
 </style>
 </head>
 <body>
-<main class="quiz-wrap">
-  <div id="root"><div style="text-align:center;padding:80px 0;color:var(--muted)">Loading quiz…</div></div>
-</main>
-
+<main class="quiz-wrap"><div id="root"><div style="text-align:center;padding:80px 0;color:var(--muted)">Loading quiz…</div></div></main>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="js/config.js"></script>
+<script src="js/session.js"></script>
 <script>
-  let user=null, quiz=null, questions=[];
-  let idx=0, locked=false;
+  let learner=null, quiz=null, questions=[], idx=0, locked=false;
   const attempts={}, firstTry={}, qAcc={};
-  const quizId = new URLSearchParams(location.search).get("id");
-
-  function escapeHtml(s){ return (s||"").replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])); }
+  const quizId=new URLSearchParams(location.search).get("id");
+  function escapeHtml(s){ return (s||"").replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])); }
 
   async function load(){
-    user = await requireAuth(); if(!user) return;
-    const { data, error } = await sb.from("quizzes").select("*").eq("id", quizId).single();
-    if(error || !data){ $("#root").innerHTML="<p>Could not load this quiz.</p>"; return; }
-    quiz = data; questions = data.questions || [];
+    learner=await requireLearner(); if(!learner) return;
+    quiz=await dataGetQuiz(learner, quizId);
+    if(!quiz){ $("#root").innerHTML="<p>Could not load this quiz.</p>"; return; }
+    questions=quiz.questions||[];
     if(!questions.length){ $("#root").innerHTML="<p>This quiz has no questions.</p>"; return; }
     renderQuestion();
   }
-
   function renderQuestion(){
-    const q = questions[idx];
-    const pct = (idx/questions.length)*100;
-    const keys = ["A","B","C","D","E","F"];
-    $("#root").innerHTML = `
-      <div class="quiz-top">
-        <button class="exit" id="exitBtn">← Exit quiz</button>
-        <span class="counter">${idx+1} / ${questions.length}</span>
-      </div>
+    const q=questions[idx], pct=(idx/questions.length)*100, keys=["A","B","C","D","E","F"];
+    $("#root").innerHTML=`
+      <div class="quiz-top"><button class="exit" id="exitBtn">← Exit quiz</button><span class="counter">${idx+1} / ${questions.length}</span></div>
       <div class="progress"><div class="bar" style="width:${pct}%"></div></div>
-      <div class="card q-card rise">
-        <div class="q-text">${escapeHtml(q.question)}</div>
-        <div class="opts" id="opts">
-          ${q.options.map((o,i)=>`<button class="opt" data-i="${i}">
-              <span class="key">${keys[i]||(i+1)}</span><span>${escapeHtml(o)}</span></button>`).join("")}
-        </div>
-        <div class="feedback" id="fb"></div>
-      </div>`;
-    $("#exitBtn").addEventListener("click", ()=>go("dashboard.html"));
-    $all(".opt").forEach(b=>b.addEventListener("click", ()=>choose(parseInt(b.dataset.i), b)));
+      <div class="card q-card rise"><div class="q-text">${escapeHtml(q.question)}</div>
+        <div class="opts" id="opts">${q.options.map((o,i)=>`<button class="opt" data-i="${i}"><span class="key">${keys[i]||(i+1)}</span><span>${escapeHtml(o)}</span></button>`).join("")}</div>
+        <div class="feedback" id="fb"></div></div>`;
+    $("#exitBtn").addEventListener("click",()=>go("dashboard.html"));
+    $all(".opt").forEach(b=>b.addEventListener("click",()=>choose(parseInt(b.dataset.i),b)));
     locked=false;
   }
-
-  function choose(i, btn){
-    if(locked) return;
-    const q = questions[idx];
-    attempts[idx] = (attempts[idx]||0)+1;
-
-    if(i === q.correctAnswer){
-      locked=true;
-      btn.classList.add("correct");
-      const acc = Math.round((1/attempts[idx])*100);
-      qAcc[idx]=acc; firstTry[idx]=(attempts[idx]===1);
-      const fb=$("#fb"); fb.className="feedback ok";
-      fb.textContent = attempts[idx]===1 ? "✓ Correct — first try! 🎉" : "✓ Correct! (took "+attempts[idx]+" tries)";
-      $all(".opt").forEach(b=>b.disabled=true);
-      setTimeout(next, 1100);
+  function choose(i,btn){
+    if(locked) return; const q=questions[idx]; attempts[idx]=(attempts[idx]||0)+1;
+    if(i===q.correctAnswer){
+      locked=true; btn.classList.add("correct");
+      const acc=Math.round((1/attempts[idx])*100); qAcc[idx]=acc; firstTry[idx]=(attempts[idx]===1);
+      const fb=$("#fb"); fb.className="feedback ok"; fb.textContent=attempts[idx]===1?"✓ Correct — first try! 🎉":"✓ Correct! (took "+attempts[idx]+" tries)";
+      $all(".opt").forEach(b=>b.disabled=true); setTimeout(next,1100);
     } else {
       btn.classList.add("wrong"); btn.disabled=true;
       const fb=$("#fb"); fb.className="feedback no"; fb.textContent="Not quite — try again 🤔";
-      setTimeout(()=>{ btn.classList.remove("wrong"); }, 500);
+      setTimeout(()=>btn.classList.remove("wrong"),500);
     }
   }
-
-  function next(){
-    idx++;
-    if(idx>=questions.length){ finish(); } else { renderQuestion(); }
-  }
-
+  function next(){ idx++; if(idx>=questions.length) finish(); else renderQuestion(); }
   async function finish(){
-    const accVals = Object.values(qAcc);
-    const accuracy = Math.round(accVals.reduce((a,b)=>a+b,0)/questions.length);
-    const firstCount = Object.values(firstTry).filter(Boolean).length;
-    const score = firstCount*10;
-
-    // save result
-    await sb.from("quizzes").update({ score, accuracy, completed:true }).eq("id", quizId);
-    sb.from("activity_log").insert({ actor_id:user.id, actor_type:"visitor", action:"quiz_completed" }).then(()=>{},()=>{});
-
-    $("#root").innerHTML = `
-      <div class="card done rise">
-        <div class="trophy">🏆</div>
-        <h1>Quiz complete!</h1>
-        <p class="muted">Nice work. Here's how you did.</p>
-        <div class="scores">
-          <div class="card scorebox"><div class="n">${accuracy}%</div><div class="l">Accuracy</div></div>
-          <div class="card scorebox"><div class="n">${firstCount}/${questions.length}</div><div class="l">First-try correct</div></div>
-        </div>
-        <button class="btn btn--primary" id="doneBtn">Save & Continue →</button>
-      </div>`;
-    $("#doneBtn").addEventListener("click", ()=>go("dashboard.html"));
-    burst();
+    const accVals=Object.values(qAcc);
+    const accuracy=Math.round(accVals.reduce((a,b)=>a+b,0)/questions.length);
+    const firstCount=Object.values(firstTry).filter(Boolean).length, score=firstCount*10;
+    try{ await dataSubmitQuiz(learner, quizId, score, accuracy); }catch(e){}
+    $("#root").innerHTML=`<div class="card done rise"><div class="trophy">🏆</div><h1>Quiz complete!</h1>
+      <p class="muted">Nice work. Here's how you did.</p>
+      <div class="scores"><div class="card scorebox"><div class="n">${accuracy}%</div><div class="l">Accuracy</div></div>
+      <div class="card scorebox"><div class="n">${firstCount}/${questions.length}</div><div class="l">First-try correct</div></div></div>
+      <button class="btn btn--primary" id="doneBtn">Save & Continue →</button></div>`;
+    $("#doneBtn").addEventListener("click",()=>go("dashboard.html")); burst();
   }
-
-  // little confetti without a library
   function burst(){
-    const n=80, root=document.body;
-    for(let k=0;k<n;k++){
-      const d=document.createElement("div");
+    for(let k=0;k<80;k++){ const d=document.createElement("div");
       const c=["#11806a","#e8a13a","#4db89c","#d4604f"][k%4];
-      d.style.cssText=`position:fixed;width:9px;height:9px;background:${c};top:30%;left:50%;
-        border-radius:2px;pointer-events:none;z-index:999;`;
-      root.appendChild(d);
+      d.style.cssText=`position:fixed;width:9px;height:9px;background:${c};top:30%;left:50%;border-radius:2px;pointer-events:none;z-index:999;`;
+      document.body.appendChild(d);
       const ang=Math.random()*Math.PI*2, vel=4+Math.random()*7;
       let x=0,y=0,vx=Math.cos(ang)*vel,vy=Math.sin(ang)*vel-6,op=1;
-      (function fall(){
-        vy+=0.32; x+=vx; y+=vy; op-=0.012;
-        d.style.transform=`translate(${x}px,${y}px) rotate(${x*4}deg)`; d.style.opacity=op;
-        if(op>0) requestAnimationFrame(fall); else d.remove();
-      })();
+      (function fall(){ vy+=0.32; x+=vx; y+=vy; op-=0.012; d.style.transform=`translate(${x}px,${y}px) rotate(${x*4}deg)`; d.style.opacity=op; if(op>0) requestAnimationFrame(fall); else d.remove(); })();
     }
   }
-
   load();
 </script>
 </body>

@@ -12,32 +12,35 @@
     color: var(--paper); padding: 54px 50px; display: flex; flex-direction: column; justify-content: space-between;
     position: relative; overflow: hidden;
   }
-  .auth-hero::after {
-    content: ""; position: absolute; width: 420px; height: 420px; right: -120px; bottom: -140px;
-    background: radial-gradient(circle, rgba(232,161,58,.35), transparent 65%); border-radius: 50%;
-  }
-  .auth-hero h1 { font-size: clamp(2.2rem, 4vw, 3.3rem); color: #fff; margin: 18px 0 14px; }
+  .auth-hero::after { content:""; position:absolute; width:420px; height:420px; right:-120px; bottom:-140px;
+    background: radial-gradient(circle, rgba(232,161,58,.35), transparent 65%); border-radius:50%; }
+  .auth-hero h1 { font-size: clamp(2.2rem,4vw,3.3rem); color:#fff; margin:18px 0 14px; }
   .auth-hero h1 em { font-style: italic; color: var(--amber); }
-  .auth-hero p.lead { font-size: 1.1rem; color: #cfe0d9; max-width: 30ch; }
-  .feat { display: flex; gap: 13px; align-items: flex-start; margin-top: 18px; position: relative; z-index: 1; }
-  .feat .ic { width: 34px; height: 34px; border-radius: 9px; background: rgba(255,255,255,.1);
-    display: grid; place-items: center; flex-shrink: 0; font-size: 1rem; }
-  .feat b { color: #fff; } .feat span { color: #b9cdc5; font-size: .92rem; }
-  .auth-hero .brand { color: #fff; position: relative; z-index: 1; }
-
-  .auth-form-side { display: grid; place-items: center; padding: 40px 28px; }
-  .auth-card { width: 100%; max-width: 400px; }
-  .auth-card h2 { font-size: 1.8rem; margin-bottom: 4px; }
-  .auth-toggle { text-align: center; margin-top: 18px; font-size: .94rem; color: var(--muted); }
-  .pw-wrap { position: relative; }
-  .pw-wrap .toggle { position: absolute; right: 12px; top: 50%; transform: translateY(-50%);
-    background: none; border: none; cursor: pointer; color: var(--muted); font-size: .82rem; font-weight: 600; }
-  @media (max-width: 820px) { .auth-split { grid-template-columns: 1fr; } .auth-hero { display: none; } }
+  .auth-hero p.lead { font-size:1.1rem; color:#cfe0d9; max-width:30ch; }
+  .feat { display:flex; gap:13px; align-items:flex-start; margin-top:18px; position:relative; z-index:1; }
+  .feat .ic { width:34px; height:34px; border-radius:9px; background:rgba(255,255,255,.1); display:grid; place-items:center; flex-shrink:0; font-size:1rem; }
+  .feat b { color:#fff; } .feat span { color:#b9cdc5; font-size:.92rem; }
+  .auth-hero .brand { color:#fff; position:relative; z-index:1; }
+  .auth-form-side { display:grid; place-items:center; padding:40px 28px; }
+  .auth-card { width:100%; max-width:400px; }
+  .auth-card h2 { font-size:1.8rem; margin-bottom:4px; }
+  .auth-toggle { text-align:center; margin-top:18px; font-size:.94rem; color:var(--muted); }
+  .pw-wrap { position:relative; }
+  .pw-wrap .toggle { position:absolute; right:12px; top:50%; transform:translateY(-50%); background:none; border:none; cursor:pointer; color:var(--muted); font-size:.82rem; font-weight:600; }
+  .choice { display:grid; gap:14px; margin-top:10px; }
+  .choice-btn { display:flex; align-items:center; gap:16px; padding:20px 22px; border:2px solid var(--line);
+    border-radius:16px; background:var(--paper-2); cursor:pointer; transition:all .18s; text-align:left; width:100%; font-family:var(--body); }
+  .choice-btn:hover { border-color:var(--emerald); transform:translateY(-2px); box-shadow:var(--shadow-sm); }
+  .choice-btn .ic { width:48px; height:48px; border-radius:13px; display:grid; place-items:center; font-size:1.5rem; flex-shrink:0; }
+  .choice-btn .ic.v { background:rgba(17,128,106,.12); } .choice-btn .ic.s { background:rgba(232,161,58,.15); }
+  .choice-btn b { display:block; font-size:1.1rem; color:var(--ink); } .choice-btn span { color:var(--muted); font-size:.9rem; }
+  .backlink { background:none; border:none; color:var(--muted); cursor:pointer; font-family:var(--body); font-weight:600; margin-bottom:14px; padding:0; }
+  .backlink:hover { color:var(--emerald-d); }
+  @media (max-width:820px){ .auth-split{grid-template-columns:1fr;} .auth-hero{display:none;} }
 </style>
 </head>
 <body>
 <div class="auth-split">
-  <!-- hero -->
   <aside class="auth-hero">
     <div class="brand"><span class="logo">📚</span> JCABSS <small>AI</small></div>
     <div>
@@ -51,127 +54,132 @@
     <p style="color:#8fa69d;font-size:.85rem;position:relative;z-index:1;">JCABSS AI Study Buddy</p>
   </aside>
 
-  <!-- form -->
   <main class="auth-form-side">
     <div class="auth-card rise">
-      <div class="brand" style="margin-bottom:22px;display:none;" id="mobileBrand"><span class="logo">📚</span> JCABSS <small>AI</small></div>
-      <h2 id="formTitle">Welcome back</h2>
-      <p class="muted" id="formSub" style="margin-bottom:22px;">Sign in to keep studying.</p>
-
       <div id="flash" class="flash"></div>
 
-      <div class="field" id="nameField" style="display:none;">
-        <label for="name">Display name <span class="muted" style="font-weight:400;">(optional)</span></label>
-        <input class="input" id="name" type="text" placeholder="e.g. Ada">
-      </div>
-      <div class="field">
-        <label for="email">Email</label>
-        <input class="input" id="email" type="email" placeholder="you@email.com" autocomplete="email">
-      </div>
-      <div class="field">
-        <label for="password">Password</label>
-        <div class="pw-wrap">
-          <input class="input" id="password" type="password" placeholder="••••••••" autocomplete="current-password">
-          <button class="toggle" type="button" id="pwToggle">Show</button>
+      <!-- STEP: landing -->
+      <div id="view-landing">
+        <h2>Welcome 👋</h2>
+        <p class="muted" style="margin-bottom:20px;">How are you joining?</p>
+        <div class="choice">
+          <button class="choice-btn" id="pickVisitor"><span class="ic v">🧑‍💻</span><div><b>I'm an individual</b><span>Sign up with your email</span></div></button>
+          <button class="choice-btn" id="pickSchool"><span class="ic s">🏫</span><div><b>I'm from a school</b><span>Log in with your name & password</span></div></button>
         </div>
       </div>
 
-      <button class="btn btn--primary btn--block" id="submitBtn">Sign In</button>
+      <!-- STEP: visitor -->
+      <div id="view-visitor" style="display:none;">
+        <button class="backlink" data-back>← Back</button>
+        <h2 id="vTitle">Welcome back</h2>
+        <p class="muted" id="vSub" style="margin-bottom:20px;">Sign in to keep studying.</p>
+        <div class="field" id="vNameField" style="display:none;">
+          <label>Display name <span class="muted" style="font-weight:400;">(optional)</span></label>
+          <input class="input" id="vName" type="text" placeholder="e.g. Ada">
+        </div>
+        <div class="field"><label>Email</label><input class="input" id="vEmail" type="email" placeholder="you@email.com"></div>
+        <div class="field"><label>Password</label>
+          <div class="pw-wrap"><input class="input" id="vPass" type="password" placeholder="••••••••"><button class="toggle" id="vPwToggle" type="button">Show</button></div>
+        </div>
+        <button class="btn btn--primary btn--block" id="vSubmit">Sign In</button>
+        <p class="auth-toggle"><span id="vToggleText">New here?</span> <a href="#" id="vToggle"><b>Create an account</b></a></p>
+      </div>
 
-      <p class="auth-toggle">
-        <span id="toggleText">New here?</span>
-        <a href="#" id="toggleLink"><b>Create an account</b></a>
-      </p>
+      <!-- STEP: school -->
+      <div id="view-school" style="display:none;">
+        <button class="backlink" data-back>← Back</button>
+        <h2>School login</h2>
+        <p class="muted" style="margin-bottom:20px;">Use the name & password your school gave you.</p>
+        <div class="field"><label>Your school</label>
+          <select class="input" id="sSchool"><option value="">Loading schools…</option></select>
+        </div>
+        <div class="field"><label>I am a</label>
+          <select class="input" id="sRole"><option value="student">Student</option><option value="teacher">Teacher / Staff</option></select>
+        </div>
+        <div class="field"><label>Your full name</label><input class="input" id="sName" type="text" placeholder="Exactly as registered"></div>
+        <div class="field"><label>Password</label>
+          <div class="pw-wrap"><input class="input" id="sPass" type="password" placeholder="e.g. Sky-Lion-4827"><button class="toggle" id="sPwToggle" type="button">Show</button></div>
+        </div>
+        <button class="btn btn--amber btn--block" id="sSubmit">Sign In</button>
+      </div>
     </div>
   </main>
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="js/config.js"></script>
+<script src="js/session.js"></script>
 <script>
-  let mode = "login"; // or "signup"
+  let vMode = "login";
+  const flashEl = $("#flash");
+  const views = { landing: $("#view-landing"), visitor: $("#view-visitor"), school: $("#view-school") };
+  function show(v){ Object.values(views).forEach(x=>x.style.display="none"); views[v].style.display="block"; flash(flashEl,""); }
 
-  const els = {
-    title: $("#formTitle"), sub: $("#formSub"), nameField: $("#nameField"),
-    submit: $("#submitBtn"), toggleText: $("#toggleText"), toggleLink: $("#toggleLink"),
-    flash: $("#flash"), email: $("#email"), password: $("#password"), name: $("#name"),
-  };
+  $("#pickVisitor").addEventListener("click", ()=>{ show("visitor"); });
+  $("#pickSchool").addEventListener("click", ()=>{ show("school"); loadSchools(); });
+  $all("[data-back]").forEach(b=>b.addEventListener("click", ()=>show("landing")));
 
-  function render() {
-    if (mode === "login") {
-      els.title.textContent = "Welcome back";
-      els.sub.textContent = "Sign in to keep studying.";
-      els.nameField.style.display = "none";
-      els.submit.textContent = "Sign In";
-      els.toggleText.textContent = "New here?";
-      els.toggleLink.innerHTML = "<b>Create an account</b>";
-    } else {
-      els.title.textContent = "Create your account";
-      els.sub.textContent = "Start turning notes into quizzes.";
-      els.nameField.style.display = "block";
-      els.submit.textContent = "Create Account";
-      els.toggleText.textContent = "Already have an account?";
-      els.toggleLink.innerHTML = "<b>Sign in</b>";
-    }
-    flash(els.flash, "");
+  // ---- visitor ----
+  function renderVisitor(){
+    if(vMode==="login"){ $("#vTitle").textContent="Welcome back"; $("#vSub").textContent="Sign in to keep studying.";
+      $("#vNameField").style.display="none"; $("#vSubmit").textContent="Sign In"; $("#vToggleText").textContent="New here?"; $("#vToggle").innerHTML="<b>Create an account</b>"; }
+    else { $("#vTitle").textContent="Create your account"; $("#vSub").textContent="Start turning notes into quizzes.";
+      $("#vNameField").style.display="block"; $("#vSubmit").textContent="Create Account"; $("#vToggleText").textContent="Already have an account?"; $("#vToggle").innerHTML="<b>Sign in</b>"; }
   }
+  $("#vToggle").addEventListener("click",(e)=>{e.preventDefault(); vMode=vMode==="login"?"signup":"login"; renderVisitor(); flash(flashEl,"");});
+  $("#vPwToggle").addEventListener("click",()=>{ const p=$("#vPass"); p.type=p.type==="password"?"text":"password"; $("#vPwToggle").textContent=p.type==="password"?"Show":"Hide"; });
 
-  $("#toggleLink").addEventListener("click", (e) => {
-    e.preventDefault(); mode = mode === "login" ? "signup" : "login"; render();
-  });
-
-  $("#pwToggle").addEventListener("click", () => {
-    const p = els.password;
-    p.type = p.type === "password" ? "text" : "password";
-    $("#pwToggle").textContent = p.type === "password" ? "Show" : "Hide";
-  });
-
-  async function submit() {
-    const email = els.email.value.trim();
-    const password = els.password.value;
-    if (!email || !password) { flash(els.flash, "Please enter your email and password."); return; }
-
-    els.submit.disabled = true;
-    const original = els.submit.textContent;
-    els.submit.innerHTML = '<span class="spinner"></span>';
-
-    try {
-      if (mode === "signup") {
-        const { data, error } = await sb.auth.signUp({ email, password });
-        if (error) throw error;
-        // store display name on the profile (created by our DB trigger)
-        const name = els.name.value.trim();
-        if (name && data.user) {
-          await sb.from("profiles").update({ display_name: name }).eq("id", data.user.id);
-        }
-        // If email confirmation is OFF, we get a session immediately.
-        const { data: { session } } = await sb.auth.getSession();
-        if (session) { go("dashboard.html"); return; }
-        flash(els.flash, "Account created! Check your email to confirm, then sign in.", "success");
-        mode = "login"; render();
+  async function visitorSubmit(){
+    const email=$("#vEmail").value.trim(), password=$("#vPass").value;
+    if(!email||!password){ flash(flashEl,"Please enter your email and password."); return; }
+    const btn=$("#vSubmit"); btn.disabled=true; const o=btn.textContent; btn.innerHTML='<span class="spinner"></span>';
+    try{
+      if(vMode==="signup"){
+        const { data, error } = await sb.auth.signUp({ email, password }); if(error) throw error;
+        const name=$("#vName").value.trim();
+        if(name && data.user){ await sb.from("profiles").update({display_name:name}).eq("id",data.user.id); }
+        const { data:{session} } = await sb.auth.getSession();
+        if(session){ go("dashboard.html"); return; }
+        flash(flashEl,"Account created! Check your email to confirm, then sign in.","success"); vMode="login"; renderVisitor();
       } else {
-        const { error } = await sb.auth.signInWithPassword({ email, password });
-        if (error) throw error;
-        go("dashboard.html");
+        const { error } = await sb.auth.signInWithPassword({ email, password }); if(error) throw error; go("dashboard.html");
       }
-    } catch (err) {
-      flash(els.flash, err.message || "Something went wrong. Please try again.");
-    } finally {
-      els.submit.disabled = false;
-      els.submit.textContent = original;
-    }
+    }catch(err){ flash(flashEl, err.message||"Something went wrong."); }
+    finally{ btn.disabled=false; btn.textContent=o; }
   }
+  $("#vSubmit").addEventListener("click", visitorSubmit);
+  $("#vPass").addEventListener("keydown",e=>{ if(e.key==="Enter") visitorSubmit(); });
 
-  els.submit.addEventListener("click", submit);
-  els.password.addEventListener("keydown", (e) => { if (e.key === "Enter") submit(); });
+  // ---- school ----
+  async function loadSchools(){
+    const sel=$("#sSchool");
+    try{
+      const { data } = await sb.from("schools").select("id,name").order("name");
+      if(!data || !data.length){ sel.innerHTML='<option value="">No schools yet</option>'; return; }
+      sel.innerHTML='<option value="">Select your school…</option>'+data.map(s=>`<option value="${s.id}">${s.name}</option>`).join("");
+    }catch(e){ sel.innerHTML='<option value="">Could not load schools</option>'; }
+  }
+  $("#sPwToggle").addEventListener("click",()=>{ const p=$("#sPass"); p.type=p.type==="password"?"text":"password"; $("#sPwToggle").textContent=p.type==="password"?"Show":"Hide"; });
 
-  // If already logged in, skip straight to dashboard.
-  (async () => {
-    const { data: { session } } = await sb.auth.getSession();
-    if (session) go("dashboard.html");
-  })();
+  async function schoolSubmit(){
+    const schoolId=$("#sSchool").value, name=$("#sName").value.trim(), password=$("#sPass").value, role=$("#sRole").value;
+    if(!schoolId){ flash(flashEl,"Please select your school."); return; }
+    if(!name||!password){ flash(flashEl,"Please enter your name and password."); return; }
+    const btn=$("#sSubmit"); btn.disabled=true; const o=btn.textContent; btn.innerHTML='<span class="spinner"></span>';
+    try{
+      const { data, error } = await sb.functions.invoke("student-login", { body:{ schoolId, name, password, role } });
+      if(error) throw new Error("Login failed. Please try again.");
+      if(data && data.error) throw new Error(data.error);
+      saveStudentSession(data.token, data.user);
+      go("dashboard.html");
+    }catch(err){ flash(flashEl, err.message||"Login failed."); btn.disabled=false; btn.textContent=o; }
+  }
+  $("#sSubmit").addEventListener("click", schoolSubmit);
+  $("#sPass").addEventListener("keydown",e=>{ if(e.key==="Enter") schoolSubmit(); });
 
-  render();
+  // already logged in?
+  (async ()=>{ const l=await currentLearner(); if(l) go("dashboard.html"); })();
+  renderVisitor();
 </script>
 </body>
 </html>
