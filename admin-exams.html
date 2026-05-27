@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Exam Content — JCABSS Admin</title>
+<link rel="stylesheet" href="styles.css">
+<style>
+  .shell { display:grid; grid-template-columns:240px 1fr; min-height:100vh; }
+  .side { background:var(--ink); color:var(--paper); padding:24px 18px; display:flex; flex-direction:column; gap:6px; position:sticky; top:0; height:100vh; }
+  .side .brand { color:#fff; margin-bottom:8px; font-size:1.1rem; } .side .tag { color:#f4c578; font-size:.75rem; margin-bottom:20px; }
+  .nav-link { display:flex; align-items:center; gap:12px; padding:12px 14px; border-radius:12px; color:#b9cdc5; font-weight:500; cursor:pointer; transition:all .18s; text-decoration:none; }
+  .nav-link:hover { background:rgba(255,255,255,.07); color:#fff; } .nav-link.active { background:var(--emerald); color:#fff; }
+  .side .spacer { flex:1; } .side .signout { color:#8fa69d; font-size:.9rem; }
+  .main { padding:30px 36px; max-width:1000px; }
+  .main h1 { font-size:1.9rem; margin-bottom:4px; }
+  .panel { padding:22px; margin-bottom:18px; } .panel h3 { font-size:1.15rem; margin-bottom:14px; }
+  .row { display:flex; gap:10px; flex-wrap:wrap; align-items:flex-end; } .row .field { flex:1; min-width:150px; margin-bottom:0; }
+  .chip-row { display:flex; gap:8px; flex-wrap:wrap; margin-top:6px; }
+  .chip { padding:8px 14px; border:1.5px solid var(--line); border-radius:999px; background:var(--paper-2); cursor:pointer; font-family:var(--body); font-weight:600; font-size:.9rem; color:var(--ink); transition:all .15s; }
+  .chip:hover { border-color:var(--emerald); } .chip.sel { background:var(--emerald); color:#fff; border-color:var(--emerald); }
+  .crumb { color:var(--muted); font-size:.9rem; margin-bottom:14px; }
+  .crumb b { color:var(--emerald-d); }
+  .topic-card { border:1px solid var(--line); border-radius:14px; padding:16px 18px; margin-bottom:12px; }
+  .topic-card .th { display:flex; justify-content:space-between; align-items:center; gap:10px; }
+  .topic-card .title { font-family:var(--display); font-weight:600; font-size:1.1rem; }
+  .badge { font-size:.72rem; padding:3px 10px; border-radius:999px; font-weight:600; }
+  .badge.draft { background:#fdf2dd; color:#8a5e12; } .badge.published { background:#e6f3ee; color:#0c5f4f; } .badge.review { background:#eee; color:#555; }
+  .topic-card .body { margin-top:10px; display:none; }
+  .topic-card.open .body { display:block; }
+  .mini { font-size:.85rem; color:var(--muted); cursor:pointer; } .mini:hover { color:var(--emerald-d); }
+  .q-item { border:1px dashed var(--line); border-radius:10px; padding:12px 14px; margin-bottom:8px; font-size:.92rem; }
+  .q-item .opts { margin-top:6px; color:var(--muted); font-size:.85rem; }
+  .q-item .correct { color:var(--emerald-d); font-weight:600; }
+  .gate { min-height:100vh; display:grid; place-items:center; text-align:center; padding:24px; }
+  .tiny-btn { padding:7px 14px; font-size:.85rem; border-radius:999px; }
+  textarea.input { min-height:80px; }
+  @media (max-width:760px){ .shell{grid-template-columns:1fr;} .side{position:static;height:auto;} .main{padding:20px;} }
+</style>
+</head>
+<body>
+<div id="gate" class="gate">
+  <div class="card card--pad" style="max-width:420px;">
+    <div class="brand" style="justify-content:center;margin-bottom:16px;"><span class="logo">📚</span> JCABSS <small>AI</small></div>
+    <h2 style="font-size:1.5rem;">Admin area</h2>
+    <p class="muted" id="gateMsg" style="margin:10px 0 18px;">Checking access…</p>
+    <a class="btn btn--primary" href="index.html" id="gateBtn" style="display:none;">Go to login</a>
+  </div>
+</div>
+
+<div class="shell" id="app" style="display:none;">
+  <nav class="side">
+    <div class="brand"><span class="logo">📚</span> JCABSS</div>
+    <div class="tag">ADMIN</div>
+    <a class="nav-link" href="admin.html"><span class="ic">🏫</span> Schools & Students</a>
+    <a class="nav-link active"><span class="ic">📖</span> Exam Content</a>
+    <div class="spacer"></div>
+    <a class="nav-link signout" id="signout"><span class="ic">↩︎</span> Sign Out</a>
+  </nav>
+  <main class="main">
+    <h1 class="rise">Exam Content</h1>
+    <p class="muted rise" style="margin-bottom:20px;">Create exams, let AI draft topics & questions, then review and publish.</p>
+    <div id="flash" class="flash"></div>
+
+    <!-- exams -->
+    <div class="card panel rise">
+      <h3>1 · Choose or create an exam</h3>
+      <div class="chip-row" id="examChips"></div>
+      <div class="row" style="margin-top:14px;">
+        <div class="field"><label>New exam name</label><input class="input" id="examName" placeholder="e.g. JAMB"></div>
+        <div class="field"><label>Level (optional)</label><input class="input" id="examLevel" placeholder="e.g. SS"></div>
+        <button class="btn btn--ghost" id="addExamBtn">Add exam</button>
+      </div>
+    </div>
+
+    <!-- subjects -->
+    <div class="card panel rise" id="subjectPanel" style="display:none;">
+      <h3>2 · Subject in <span id="examCrumb" style="color:var(--emerald-d);"></span></h3>
+      <div class="chip-row" id="subjectChips"></div>
+      <div class="row" style="margin-top:14px;">
+        <div class="field"><label>New subject</label><input class="input" id="subjectName" placeholder="e.g. Biology"></div>
+        <button class="btn btn--ghost" id="addSubjectBtn">Add subject</button>
+      </div>
+    </div>
+
+    <!-- topics -->
+    <div class="card panel rise" id="topicPanel" style="display:none;">
+      <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;">
+        <h3 style="margin:0;">3 · Topics in <span id="subjectCrumb" style="color:var(--emerald-d);"></span></h3>
+        <button class="btn btn--amber tiny-btn" id="genTopicsBtn">✨ AI: draft topics</button>
+      </div>
+      <p class="muted" style="font-size:.85rem;margin:8px 0 14px;">AI drafts are saved as <b>draft</b>. Edit, then Publish to make them visible to students.</p>
+      <div id="topicList"></div>
+    </div>
+  </main>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="js/config.js"></script>
+<script src="js/session.js"></script>
+<script>
+  let exams=[], subjects=[], topics=[];
+  let selExam=null, selSubject=null;
+  function escapeHtml(s){ return (s||"").replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])); }
+
+  async function admin(action, payload={}){
+    const { data, error } = await sb.functions.invoke("admin-actions", { body:{ action, payload } });
+    if(error){ let m=error.message||"Request failed"; try{ if(error.context&&error.context.json){ const j=await error.context.json(); if(j&&j.error) m=j.error; } }catch(e){} throw new Error(m); }
+    if(data && data.error) throw new Error(data.error);
+    return data;
+  }
+  async function ai(body){
+    const { data, error } = await sb.functions.invoke("ai-generate", { body });
+    if(error){ let m=error.message||"AI failed"; try{ if(error.context&&error.context.json){ const j=await error.context.json(); if(j&&j.error) m=j.error; } }catch(e){} throw new Error(m); }
+    if(data && data.error) throw new Error(data.error);
+    return data;
+  }
+
+  async function checkAdmin(){
+    const { data:{ session } } = await sb.auth.getSession();
+    if(!session){ $("#gateMsg").textContent="Log in as admin first."; $("#gateBtn").style.display="inline-flex"; return; }
+    const { data: prof } = await sb.from("profiles").select("role").eq("id", session.user.id).maybeSingle();
+    if(!prof || prof.role!=="admin"){ $("#gateMsg").textContent="Not an admin account."; $("#gateBtn").style.display="inline-flex"; return; }
+    $("#gate").style.display="none"; $("#app").style.display="grid";
+    loadExams();
+  }
+  $("#signout").addEventListener("click", logoutLearner);
+
+  // ---- exams ----
+  async function loadExams(){
+    try{ exams=(await admin("list_exams")).exams; renderExams(); }catch(e){ flash($("#flash"),e.message); }
+  }
+  function renderExams(){
+    const c=$("#examChips");
+    c.innerHTML = exams.length ? exams.map(e=>`<button class="chip ${selExam&&selExam.id===e.id?'sel':''}" data-id="${e.id}">${escapeHtml(e.name)}</button>`).join("") : '<span class="muted">No exams yet — add one below.</span>';
+    $all("#examChips .chip").forEach(b=>b.addEventListener("click",()=>{ selExam=exams.find(x=>x.id===b.dataset.id); selSubject=null; renderExams(); openSubjects(); }));
+  }
+  $("#addExamBtn").addEventListener("click", async ()=>{
+    const name=$("#examName").value.trim(); if(!name){ flash($("#flash"),"Enter an exam name."); return; }
+    const level=$("#examLevel").value.trim()||null;
+    try{ await admin("create_exam",{name,level}); $("#examName").value=""; $("#examLevel").value=""; flash($("#flash"),"Exam added.","success"); loadExams(); }catch(e){ flash($("#flash"),e.message); }
+  });
+
+  // ---- subjects ----
+  async function openSubjects(){
+    $("#subjectPanel").style.display="block"; $("#topicPanel").style.display="none";
+    $("#examCrumb").textContent=selExam.name;
+    try{ subjects=(await admin("list_subjects",{examId:selExam.id})).subjects; renderSubjects(); }catch(e){ flash($("#flash"),e.message); }
+  }
+  function renderSubjects(){
+    const c=$("#subjectChips");
+    c.innerHTML = subjects.length ? subjects.map(s=>`<button class="chip ${selSubject&&selSubject.id===s.id?'sel':''}" data-id="${s.id}">${escapeHtml(s.name)}</button>`).join("") : '<span class="muted">No subjects yet — add one below.</span>';
+    $all("#subjectChips .chip").forEach(b=>b.addEventListener("click",()=>{ selSubject=subjects.find(x=>x.id===b.dataset.id); renderSubjects(); openTopics(); }));
+  }
+  $("#addSubjectBtn").addEventListener("click", async ()=>{
+    const name=$("#subjectName").value.trim(); if(!name){ flash($("#flash"),"Enter a subject."); return; }
+    try{ await admin("create_subject",{examId:selExam.id,name}); $("#subjectName").value=""; flash($("#flash"),"Subject added.","success"); openSubjects(); }catch(e){ flash($("#flash"),e.message); }
+  });
+
+  // ---- topics ----
+  async function openTopics(){
+    $("#topicPanel").style.display="block"; $("#subjectCrumb").textContent=selSubject.name;
+    try{ topics=(await admin("list_topics",{subjectId:selSubject.id})).topics; renderTopics(); }catch(e){ flash($("#flash"),e.message); }
+  }
+  function renderTopics(){
+    const list=$("#topicList");
+    if(!topics.length){ list.innerHTML='<p class="muted">No topics yet. Click "AI: draft topics" to generate some.</p>'; return; }
+    list.innerHTML="";
+    topics.forEach(t=>{
+      const card=document.createElement("div"); card.className="topic-card";
+      card.innerHTML=`
+        <div class="th">
+          <span class="title">${escapeHtml(t.title)}</span>
+          <span style="display:flex;gap:8px;align-items:center;">
+            <span class="badge ${t.status}">${t.status}</span>
+            <span class="mini toggle">expand ▾</span>
+          </span>
+        </div>
+        <div class="body">
+          <div class="field"><label>Summary</label><textarea class="input s">${escapeHtml(t.summary||"")}</textarea></div>
+          <div class="field"><label>Key points (one per line, start with -)</label><textarea class="input bp">${escapeHtml(t.bullet_points||"")}</textarea></div>
+          <div class="field"><label>Focus note</label><input class="input fn" value="${escapeHtml(t.focus_note||"")}"></div>
+          <div class="row" style="gap:8px;">
+            <button class="btn btn--primary tiny-btn save">💾 Save</button>
+            ${t.status!=="published"?'<button class="btn btn--amber tiny-btn pub">✅ Publish</button>':'<button class="btn btn--ghost tiny-btn unpub">↩ Unpublish</button>'}
+            <button class="btn btn--ghost tiny-btn genq">✨ Generate questions</button>
+            <button class="mini del" style="margin-left:auto;">Delete</button>
+          </div>
+          <div class="qbox" style="margin-top:12px;"></div>
+        </div>`;
+      const body=card.querySelector(".body");
+      card.querySelector(".toggle").addEventListener("click",()=>{ card.classList.toggle("open"); card.querySelector(".toggle").textContent=card.classList.contains("open")?"collapse ▴":"expand ▾"; });
+      card.querySelector(".save").addEventListener("click",async()=>{
+        try{ await admin("update_topic",{topicId:t.id,fields:{ summary:body.querySelector(".s").value, bullet_points:body.querySelector(".bp").value, focus_note:body.querySelector(".fn").value }}); flash($("#flash"),"Saved.","success"); }catch(e){ flash($("#flash"),e.message); }
+      });
+      const pub=card.querySelector(".pub"); if(pub) pub.addEventListener("click",async()=>{ try{ await admin("update_topic",{topicId:t.id,fields:{status:"published"}}); openTopics(); }catch(e){ flash($("#flash"),e.message); } });
+      const unpub=card.querySelector(".unpub"); if(unpub) unpub.addEventListener("click",async()=>{ try{ await admin("update_topic",{topicId:t.id,fields:{status:"draft"}}); openTopics(); }catch(e){ flash($("#flash"),e.message); } });
+      card.querySelector(".del").addEventListener("click",async()=>{ if(!confirm("Delete this topic?")) return; try{ await admin("delete_topic",{topicId:t.id}); openTopics(); }catch(e){ flash($("#flash"),e.message); } });
+      card.querySelector(".genq").addEventListener("click",()=>genQuestions(t, card.querySelector(".qbox")));
+      list.appendChild(card);
+    });
+  }
+
+  $("#genTopicsBtn").addEventListener("click", async ()=>{
+    const btn=$("#genTopicsBtn"); btn.disabled=true; const o=btn.textContent; btn.innerHTML='<span class="spinner"></span> Drafting…';
+    try{
+      const res=await ai({ action:"exam_topics", examName:selExam.name, subjectName:selSubject.name, level:selExam.level||"" });
+      if(!res.topics||!res.topics.length) throw new Error("AI returned no topics. Try again.");
+      await admin("save_topics",{subjectId:selSubject.id, topics:res.topics});
+      flash($("#flash"),`Drafted ${res.topics.length} topics. Review and publish below.`,"success");
+      openTopics();
+    }catch(e){ flash($("#flash"),e.message); }
+    finally{ btn.disabled=false; btn.textContent=o; }
+  });
+
+  async function genQuestions(topic, box){
+    box.innerHTML='<span class="muted">Generating questions… <span class="spinner" style="border-top-color:var(--emerald);"></span></span>';
+    try{
+      const res=await ai({ action:"exam_questions", examName:selExam.name, subjectName:selSubject.name, topicTitle:topic.title, count:10 });
+      if(!res.questions||!res.questions.length){ box.innerHTML='<span class="muted">No questions generated.</span>'; return; }
+      await admin("save_questions",{subjectId:selSubject.id, topicId:topic.id, questions:res.questions, source:"ai"});
+      box.innerHTML=`<p class="mini" style="color:var(--emerald-d);margin-bottom:8px;">✅ Saved ${res.questions.length} questions (draft). Publish them below.</p>`+
+        res.questions.map(q=>`<div class="q-item">${escapeHtml(q.question)}<div class="opts">${q.options.map((o,i)=>`${i===q.correctAnswer?'<span class="correct">✓ '+escapeHtml(o)+'</span>':escapeHtml(o)}`).join(" · ")}</div></div>`).join("")+
+        `<button class="btn btn--amber tiny-btn pubq" style="margin-top:8px;">✅ Publish these questions</button>`;
+      box.querySelector(".pubq").addEventListener("click",async()=>{
+        try{
+          const { questions } = await admin("list_questions",{subjectId:selSubject.id, topicId:topic.id});
+          const draftIds=questions.filter(q=>q.status!=="published").map(q=>q.id);
+          if(draftIds.length){ await admin("set_status",{kind:"exam_questions", ids:draftIds, status:"published"}); }
+          flash($("#flash"),"Questions published.","success");
+        }catch(e){ flash($("#flash"),e.message); }
+      });
+    }catch(e){ box.innerHTML=`<span class="flash flash--error" style="display:block;">${escapeHtml(e.message)}</span>`; }
+  }
+
+  checkAdmin();
+</script>
+</body>
+</html>

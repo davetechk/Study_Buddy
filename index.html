@@ -168,7 +168,12 @@
     const btn=$("#sSubmit"); btn.disabled=true; const o=btn.textContent; btn.innerHTML='<span class="spinner"></span>';
     try{
       const { data, error } = await sb.functions.invoke("student-login", { body:{ schoolId, name, password, role } });
-      if(error) throw new Error("Login failed. Please try again.");
+      if(error){
+        // try to read the real error returned by the function body
+        let msg = error.message || "Login failed.";
+        try { if(error.context && typeof error.context.json === "function"){ const j = await error.context.json(); if(j && j.error) msg = j.error; } } catch(e){}
+        throw new Error(msg);
+      }
       if(data && data.error) throw new Error(data.error);
       saveStudentSession(data.token, data.user);
       go("dashboard.html");
