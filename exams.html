@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Exam Prep — JCABSS AI</title>
+<link rel="stylesheet" href="styles.css">
+<style>
+  .topbar2 { display:flex; align-items:center; justify-content:space-between; max-width:1000px; margin:0 auto; padding:18px 22px; }
+  .back { color:var(--muted); font-weight:600; cursor:pointer; background:none; border:none; font-family:var(--body); font-size:.95rem; }
+  .back:hover { color:var(--emerald-d); }
+  .wrap2 { max-width:1000px; margin:0 auto; padding:10px 22px 60px; }
+  .crumbs { color:var(--muted); font-size:.9rem; margin-bottom:18px; }
+  .crumbs b { color:var(--ink); }
+  h1.page { font-size:2rem; margin-bottom:6px; }
+  .grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(220px,1fr)); gap:14px; margin-top:18px; }
+  .tile { padding:22px; cursor:pointer; transition:transform .15s, box-shadow .2s; display:flex; flex-direction:column; gap:8px; }
+  .tile:hover { transform:translateY(-3px); box-shadow:var(--shadow); }
+  .tile .ic { width:46px; height:46px; border-radius:13px; background:rgba(17,128,106,.12); display:grid; place-items:center; font-size:1.4rem; }
+  .tile.amber .ic { background:rgba(232,161,58,.16); }
+  .tile b { font-size:1.1rem; } .tile span { color:var(--muted); font-size:.86rem; }
+  .topic-read { padding:28px; margin-top:18px; }
+  .topic-read h2 { font-size:1.7rem; margin-bottom:4px; }
+  .topic-read .sec { margin-top:20px; } .topic-read .sec h3 { font-size:1.1rem; margin-bottom:8px; display:flex; gap:8px; align-items:center; }
+  .topic-read .summary { line-height:1.7; color:var(--ink-2); }
+  .bullets { list-style:none; counter-reset:kt; }
+  .bullets li { padding:9px 0 9px 40px; position:relative; line-height:1.55; border-bottom:1px dashed var(--line); }
+  .bullets li:last-child{border-bottom:none;}
+  .bullets li::before { counter-increment:kt; content:counter(kt, decimal) "."; position:absolute; left:0; top:9px; width:28px; text-align:center; font-family:var(--display); font-weight:700; font-size:.9rem; color:#fff; background:var(--emerald); border-radius:7px; line-height:1.5; }
+  .focus { background:rgba(232,161,58,.12); border:1px solid #f0d9a6; color:#8a5e12; padding:14px 16px; border-radius:12px; line-height:1.6; }
+  .quiz-setup { background:var(--paper); border:1px solid var(--line); border-radius:14px; padding:18px; margin-top:22px; }
+  .seg { display:flex; gap:6px; background:var(--paper-2); padding:5px; border-radius:12px; border:1px solid var(--line); margin:10px 0 14px; }
+  .seg button { flex:1; padding:9px; border:none; background:transparent; border-radius:9px; font-family:var(--body); font-weight:600; color:var(--muted); cursor:pointer; }
+  .seg button.active { background:var(--emerald); color:#fff; }
+  .count-row { display:flex; gap:8px; flex-wrap:wrap; margin-bottom:14px; }
+  .count-row button { padding:9px 16px; border-radius:10px; border:1.5px solid var(--line); background:var(--paper-2); font-weight:600; cursor:pointer; font-family:var(--body); }
+  .count-row button.active { background:var(--emerald); color:#fff; border-color:var(--emerald); }
+  .loading-state { text-align:center; padding:70px 20px; color:var(--muted); }
+  .empty { text-align:center; padding:50px 20px; color:var(--muted); } .empty .big { font-size:2.6rem; margin-bottom:10px; }
+</style>
+</head>
+<body>
+<div class="topbar2">
+  <div class="brand"><span class="logo">📚</span> JCABSS <small>AI</small></div>
+  <a class="back" href="dashboard.html">← Dashboard</a>
+</div>
+<main class="wrap2">
+  <div id="root"><div class="loading-state">Loading…</div></div>
+</main>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="js/config.js"></script>
+<script src="js/session.js"></script>
+<script>
+  let learner=null;
+  let state={ exam:null, subject:null };
+  function escapeHtml(s){ return (s||"").replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])); }
+  function parsePoints(raw){
+    if(!raw) return []; let items=[]; const text=String(raw).trim();
+    if(text.startsWith("[")){ try{ const a=JSON.parse(text); if(Array.isArray(a)) items=a; }catch(e){} }
+    if(!items.length) items=text.split("\n");
+    return items.map(s=>String(s).replace(/^\s*([-*•]|\d+[.)]|[a-zA-Z][.)])\s*/,"").trim()).filter(Boolean);
+  }
+
+  async function init(){ learner=await requireLearner(); if(!learner) return; showExams(); }
+
+  // ---- exams ----
+  async function showExams(){
+    state={exam:null,subject:null};
+    $("#root").innerHTML='<div class="loading-state">Loading exams…</div>';
+    const exams=await examList(learner);
+    if(!exams.length){ $("#root").innerHTML='<div class="card empty"><div class="big">📚</div><p>No exams available yet. Check back soon.</p></div>'; return; }
+    const icons=["📕","📗","📘","📙","📚","🎓"];
+    $("#root").innerHTML=`<h1 class="page rise">Exam Preparation</h1>
+      <p class="muted rise">Pick an exam to start studying topics and practising questions.</p>
+      <div class="grid rise" id="grid"></div>`;
+    const g=$("#grid");
+    exams.forEach((e,i)=>{
+      const t=document.createElement("div"); t.className="card tile";
+      t.innerHTML=`<div class="ic">${icons[i%icons.length]}</div><b>${escapeHtml(e.name)}</b><span>${e.level?escapeHtml(e.level)+" level":"Tap to open"}</span>`;
+      t.addEventListener("click",()=>showSubjects(e)); g.appendChild(t);
+    });
+  }
+
+  // ---- subjects ----
+  async function showSubjects(exam){
+    state.exam=exam; state.subject=null;
+    $("#root").innerHTML='<div class="loading-state">Loading subjects…</div>';
+    const subjects=await examSubjects(learner, exam.id);
+    let html=`<div class="crumbs rise"><a class="back" onclick="showExams()" style="padding:0;">Exams</a> › <b>${escapeHtml(exam.name)}</b></div>
+      <h1 class="page rise">${escapeHtml(exam.name)} subjects</h1>`;
+    if(!subjects.length){ html+='<div class="card empty"><div class="big">📘</div><p>No subjects yet for this exam.</p></div>'; $("#root").innerHTML=html; return; }
+    html+='<div class="grid rise" id="grid"></div>'; $("#root").innerHTML=html;
+    const g=$("#grid");
+    subjects.forEach(s=>{
+      const t=document.createElement("div"); t.className="card tile amber";
+      t.innerHTML=`<div class="ic">📖</div><b>${escapeHtml(s.name)}</b><span>Topics & quizzes</span>`;
+      t.addEventListener("click",()=>showTopics(s)); g.appendChild(t);
+    });
+  }
+
+  // ---- topics ----
+  async function showTopics(subject){
+    state.subject=subject;
+    $("#root").innerHTML='<div class="loading-state">Loading topics…</div>';
+    const topics=await examTopics(learner, subject.id);
+    let html=`<div class="crumbs rise"><a class="back" onclick="showExams()" style="padding:0;">Exams</a> › <a class="back" onclick="backToSubjects()" style="padding:0;">${escapeHtml(state.exam.name)}</a> › <b>${escapeHtml(subject.name)}</b></div>
+      <h1 class="page rise">${escapeHtml(subject.name)}</h1>
+      <p class="muted rise">Read a topic, or jump straight to a whole-subject quiz.</p>`;
+    if(!topics.length){ html+='<div class="card empty"><div class="big">🎯</div><p>No published topics yet for this subject.</p></div>'; $("#root").innerHTML=html; return; }
+    html+=`<div style="margin:16px 0;"><button class="btn btn--amber" id="subjQuiz">🎯 Quiz me on the whole subject</button></div>`;
+    html+='<div class="grid rise" id="grid"></div>'; $("#root").innerHTML=html;
+    const g=$("#grid");
+    topics.forEach(t=>{
+      const el=document.createElement("div"); el.className="card tile";
+      el.innerHTML=`<div class="ic">🎯</div><b>${escapeHtml(t.title)}</b><span>${escapeHtml((t.summary||"").slice(0,60))}…</span>`;
+      el.addEventListener("click",()=>showTopicRead(t)); g.appendChild(el);
+    });
+    $("#subjQuiz").addEventListener("click",()=>openQuizSetup({subjectId:subject.id, label:subject.name+" (whole subject)"}));
+  }
+  window.backToSubjects=()=>showSubjects(state.exam);
+
+  // ---- topic reader ----
+  async function showTopicRead(topic){
+    $("#root").innerHTML='<div class="loading-state">Loading topic…</div>';
+    const t=await examTopic(learner, topic.id) || topic;
+    const points=parsePoints(t.bullet_points);
+    $("#root").innerHTML=`
+      <div class="crumbs rise"><a class="back" onclick="showExams()" style="padding:0;">Exams</a> › <a class="back" onclick="backToSubjects()" style="padding:0;">${escapeHtml(state.exam.name)}</a> › <a class="back" onclick="backToTopics()" style="padding:0;">${escapeHtml(state.subject.name)}</a> › <b>${escapeHtml(t.title)}</b></div>
+      <div class="card topic-read rise">
+        <h2>${escapeHtml(t.title)}</h2>
+        <div class="sec"><h3>📋 Overview</h3><p class="summary">${escapeHtml(t.summary||"")}</p></div>
+        ${points.length?`<div class="sec"><h3>🎯 Key points</h3><ol class="bullets">${points.map(p=>`<li>${escapeHtml(p)}</li>`).join("")}</ol></div>`:""}
+        ${t.focus_note?`<div class="sec"><h3>🔎 Where to focus</h3><div class="focus">${escapeHtml(t.focus_note)}</div></div>`:""}
+        <div style="margin-top:22px;"><button class="btn btn--amber" id="topicQuiz">🎯 Quiz me on this topic</button></div>
+      </div>`;
+    $("#topicQuiz").addEventListener("click",()=>openQuizSetup({topicId:t.id, label:t.title}));
+  }
+  window.backToTopics=()=>showTopics(state.subject);
+
+  // ---- quiz setup (choose count) ----
+  function openQuizSetup(target){
+    let count=10;
+    const host=document.createElement("div"); host.className="card quiz-setup rise";
+    host.innerHTML=`<h3 style="font-size:1.15rem;margin-bottom:4px;">Set up your quiz</h3>
+      <p class="muted" style="font-size:.9rem;">${escapeHtml(target.label)}</p>
+      <label style="display:block;font-weight:600;margin:14px 0 6px;">How many questions?</label>
+      <div class="count-row" id="counts">
+        ${[5,10,15,20].map(n=>`<button data-n="${n}" class="${n===10?'active':''}">${n}</button>`).join("")}
+      </div>
+      <button class="btn btn--primary btn--block" id="startQuiz">Start quiz →</button>
+      <div id="qsFlash" class="flash" style="margin-top:12px;"></div>`;
+    $("#root").appendChild(host);
+    host.scrollIntoView({behavior:"smooth"});
+    host.querySelectorAll("#counts button").forEach(b=>b.addEventListener("click",()=>{
+      host.querySelectorAll("#counts button").forEach(x=>x.classList.remove("active"));
+      b.classList.add("active"); count=parseInt(b.dataset.n);
+    }));
+    host.querySelector("#startQuiz").addEventListener("click",async()=>{
+      const btn=host.querySelector("#startQuiz"); btn.disabled=true; const o=btn.textContent; btn.innerHTML='<span class="spinner"></span> Preparing…';
+      try{
+        const quiz=await examStartQuiz(learner, { topicId:target.topicId||null, subjectId:target.subjectId||null, count });
+        go("quiz.html?id="+quiz.id);
+      }catch(err){ flash(host.querySelector("#qsFlash"), err.message); btn.disabled=false; btn.textContent=o; }
+    });
+  }
+
+  window.showExams=showExams;
+  init();
+</script>
+</body>
+</html>

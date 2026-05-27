@@ -130,3 +130,47 @@ async function dataSubmitQuiz(learner, quizId, score, accuracy) {
   await sb.from("quizzes").update({ score, accuracy, completed:true }).eq("id", quizId);
   sb.from("activity_log").insert({ actor_id: learner.id, actor_type:"visitor", action:"quiz_completed" }).then(()=>{},()=>{});
 }
+
+// ============================================================================
+//  Exam-prep browsing — works for BOTH visitor and student.
+//  Visitor → direct Supabase (RLS allows logged-in users to read published).
+//  Student → student-data function.
+// ============================================================================
+async function examList(learner) {
+  if (learner.type === "student") return (await studentData("exam_list")).exams;
+  const { data } = await sb.from("exams").select("*").order("sort_order").order("name");
+  return data || [];
+}
+async function examSubjects(learner, examId) {
+  if (learner.type === "student") return (await studentData("exam_subjects",{examId})).subjects;
+  const { data } = await sb.from("subjects").select("*").eq("exam_id", examId).order("sort_order").order("name");
+  return data || [];
+}
+async function examTopics(learner, subjectId) {
+  if (learner.type === "student") return (await studentData("exam_topics",{subjectId})).topics;
+  const { data } = await sb.from("topics").select("*").eq("subject_id", subjectId).eq("status","published").order("sort_order");
+  return data || [];
+}
+async function examTopic(learner, topicId) {
+  if (learner.type === "student") return (await studentData("exam_topic",{topicId})).topic;
+  const { data } = await sb.from("topics").select("*").eq("id", topicId).eq("status","published").maybeSingle();
+  return data;
+}
+async function examStartQuiz(learner, { topicId, subjectId, count }) {
+  if (learner.type === "student") return (await studentData("exam_start_quiz",{topicId,subjectId,count})).quiz;
+  // visitor path: read published questions directly, build quiz row
+  let q = sb.from("exam_questions").select("*").eq("status","published");
+  if (topicId) q = q.eq("topic_id", topicId); else q = q.eq("subject_id", subjectId);
+  const { data } = await q;
+  let pool = (data||[]).slice();
+  if (!pool.length) throw new Error("No published questions available yet for this selection.");
+  for (let i=pool.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [pool[i],pool[j]]=[pool[j],pool[i]]; }
+  const n = Math.min(Math.max(parseInt(count)||10,1), pool.length);
+  const chosen = pool.slice(0,n).map(r=>({ question:r.question, options:r.options, correctAnswer:r.correct_answer, explanation:r.explanation||null }));
+  const { data: quiz, error } = await sb.from("quizzes").insert({
+    learner_id: learner.id, learner_type:"visitor", source_type:"exam", topic_id: topicId||null,
+    questions: chosen, completed:false, score:0, accuracy:0
+  }).select().single();
+  if (error) throw error;
+  return quiz;
+}
