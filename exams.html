@@ -108,7 +108,11 @@
       <h1 class="page rise">${escapeHtml(subject.name)}</h1>
       <p class="muted rise">Read a topic, or jump straight to a whole-subject quiz.</p>`;
     if(!topics.length){ html+='<div class="card empty"><div class="big">🎯</div><p>No published topics yet for this subject.</p></div>'; $("#root").innerHTML=html; return; }
-    html+=`<div style="margin:16px 0;"><button class="btn btn--amber" id="subjQuiz">🎯 Quiz me on the whole subject</button></div>`;
+    html+=`<div style="margin:16px 0;display:flex;gap:10px;flex-wrap:wrap;">
+        <button class="btn btn--amber" id="subjQuiz">🎯 Quiz me on the whole subject</button>
+        <button class="btn btn--ghost" id="pastQuiz">📜 Past-question quiz</button>
+      </div>`;
+    html+='<div id="pastFilesBox"></div>';
     html+='<div class="grid rise" id="grid"></div>'; $("#root").innerHTML=html;
     const g=$("#grid");
     topics.forEach(t=>{
@@ -117,8 +121,25 @@
       el.addEventListener("click",()=>showTopicRead(t)); g.appendChild(el);
     });
     $("#subjQuiz").addEventListener("click",()=>openQuizSetup({subjectId:subject.id, label:subject.name+" (whole subject)"}));
+    $("#pastQuiz").addEventListener("click",()=>openQuizSetup({subjectId:subject.id, label:subject.name+" — past questions", source:"past_question"}));
+    loadPastFiles(subject.id);
   }
   window.backToSubjects=()=>showSubjects(state.exam);
+
+  // ---- past papers (downloadable) ----
+  async function loadPastFiles(subjectId){
+    try{
+      const files = await examPastFiles(learner, subjectId);
+      const box=$("#pastFilesBox");
+      if(!box) return;
+      if(!files.length){ box.innerHTML=""; return; }
+      box.innerHTML=`<div class="card" style="padding:16px 20px;margin-bottom:14px;">
+        <b style="font-size:1rem;">📂 Past papers to download</b>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:10px;">
+          ${files.map(f=>`<a class="btn btn--ghost" href="${f.file_url}" target="_blank" style="padding:8px 14px;font-size:.88rem;">📄 ${f.year||"Paper"} ↗</a>`).join("")}
+        </div></div>`;
+    }catch(e){ /* silent */ }
+  }
 
   // ---- topic reader ----
   async function showTopicRead(topic){
@@ -159,7 +180,7 @@
     host.querySelector("#startQuiz").addEventListener("click",async()=>{
       const btn=host.querySelector("#startQuiz"); btn.disabled=true; const o=btn.textContent; btn.innerHTML='<span class="spinner"></span> Preparing…';
       try{
-        const quiz=await examStartQuiz(learner, { topicId:target.topicId||null, subjectId:target.subjectId||null, count });
+        const quiz=await examStartQuiz(learner, { topicId:target.topicId||null, subjectId:target.subjectId||null, count, source:target.source||null });
         go("quiz.html?id="+quiz.id);
       }catch(err){ flash(host.querySelector("#qsFlash"), err.message); btn.disabled=false; btn.textContent=o; }
     });

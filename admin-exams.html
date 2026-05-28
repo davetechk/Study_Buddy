@@ -9,33 +9,32 @@
   .shell { display:grid; grid-template-columns:240px 1fr; min-height:100vh; }
   .side { background:var(--ink); color:var(--paper); padding:24px 18px; display:flex; flex-direction:column; gap:6px; position:sticky; top:0; height:100vh; }
   .side .brand { color:#fff; margin-bottom:8px; font-size:1.1rem; } .side .tag { color:#f4c578; font-size:.75rem; margin-bottom:20px; }
-  .nav-link { display:flex; align-items:center; gap:12px; padding:12px 14px; border-radius:12px; color:#b9cdc5; font-weight:500; cursor:pointer; transition:all .18s; text-decoration:none; }
-  .nav-link:hover { background:rgba(255,255,255,.07); color:#fff; } .nav-link.active { background:var(--emerald); color:#fff; }
+  .nav-link { display:flex; align-items:center; gap:12px; padding:12px 14px; border-radius:12px; color:#b9cdc5; font-weight:500; cursor:pointer; transition:all .18s; }
+  .nav-link:hover { background:rgba(255,255,255,.07); color:#fff; text-decoration:none; } .nav-link.active { background:var(--emerald); color:#fff; }
   .side .spacer { flex:1; } .side .signout { color:#8fa69d; font-size:.9rem; }
-  .main { padding:30px 36px; max-width:1000px; }
-  .main h1 { font-size:1.9rem; margin-bottom:4px; }
-  .panel { padding:22px; margin-bottom:18px; } .panel h3 { font-size:1.15rem; margin-bottom:14px; }
-  .row { display:flex; gap:10px; flex-wrap:wrap; align-items:flex-end; } .row .field { flex:1; min-width:150px; margin-bottom:0; }
-  .chip-row { display:flex; gap:8px; flex-wrap:wrap; margin-top:6px; }
-  .chip { padding:8px 14px; border:1.5px solid var(--line); border-radius:999px; background:var(--paper-2); cursor:pointer; font-family:var(--body); font-weight:600; font-size:.9rem; color:var(--ink); transition:all .15s; }
+  .main { padding:34px 38px; max-width:1000px; }
+  .main h1 { font-size:2rem; margin-bottom:4px; }
+  .panel { padding:22px; margin-bottom:18px; } .panel h3 { font-size:1.15rem; margin-bottom:12px; }
+  .row { display:flex; gap:12px; flex-wrap:wrap; align-items:flex-end; } .row .field { flex:1; min-width:160px; margin-bottom:0; }
+  .chip-row { display:flex; gap:8px; flex-wrap:wrap; margin-top:8px; }
+  .chip { padding:8px 14px; border-radius:999px; border:1.5px solid var(--line); background:var(--paper-2); cursor:pointer; font-weight:600; font-size:.9rem; font-family:var(--body); transition:all .15s; }
   .chip:hover { border-color:var(--emerald); } .chip.sel { background:var(--emerald); color:#fff; border-color:var(--emerald); }
-  .crumb { color:var(--muted); font-size:.9rem; margin-bottom:14px; }
-  .crumb b { color:var(--emerald-d); }
   .topic-card { border:1px solid var(--line); border-radius:14px; padding:16px 18px; margin-bottom:12px; }
-  .topic-card .th { display:flex; justify-content:space-between; align-items:center; gap:10px; }
-  .topic-card .title { font-family:var(--display); font-weight:600; font-size:1.1rem; }
-  .badge { font-size:.72rem; padding:3px 10px; border-radius:999px; font-weight:600; }
-  .badge.draft { background:#fdf2dd; color:#8a5e12; } .badge.published { background:#e6f3ee; color:#0c5f4f; } .badge.review { background:#eee; color:#555; }
-  .topic-card .body { margin-top:10px; display:none; }
-  .topic-card.open .body { display:block; }
-  .mini { font-size:.85rem; color:var(--muted); cursor:pointer; } .mini:hover { color:var(--emerald-d); }
-  .q-item { border:1px dashed var(--line); border-radius:10px; padding:12px 14px; margin-bottom:8px; font-size:.92rem; }
-  .q-item .opts { margin-top:6px; color:var(--muted); font-size:.85rem; }
+  .topic-card .thead { display:flex; align-items:center; justify-content:space-between; gap:10px; }
+  .topic-card h4 { font-size:1.05rem; } .topic-card .meta { display:flex; gap:8px; align-items:center; }
+  .status-pill { font-size:.72rem; padding:3px 10px; border-radius:999px; font-weight:700; }
+  .st-draft { background:#fdf2dd; color:#8a5e12; } .st-review { background:#e7e0fb; color:#5b3eb5; } .st-published { background:#e6f3ee; color:#0c5f4f; }
+  .topic-body { margin-top:12px; padding-top:12px; border-top:1px dashed var(--line); display:none; }
+  .topic-body.open { display:block; }
+  .mini-btn { padding:7px 12px; font-size:.82rem; border-radius:8px; border:1.5px solid var(--line); background:var(--paper-2); cursor:pointer; font-family:var(--body); font-weight:600; }
+  .mini-btn:hover { border-color:var(--emerald); color:var(--emerald-d); }
+  .mini-btn.green { background:var(--emerald); color:#fff; border-color:var(--emerald); }
+  .q-item { border:1px solid var(--line); border-radius:10px; padding:12px 14px; margin-bottom:8px; font-size:.92rem; }
+  .q-item .opts { margin-top:6px; color:var(--muted); }
   .q-item .correct { color:var(--emerald-d); font-weight:600; }
-  .gate { min-height:100vh; display:grid; place-items:center; text-align:center; padding:24px; }
-  .tiny-btn { padding:7px 14px; font-size:.85rem; border-radius:999px; }
+  .gate { min-height:100vh; display:grid; place-items:center; padding:24px; text-align:center; }
   textarea.input { min-height:80px; }
-  @media (max-width:760px){ .shell{grid-template-columns:1fr;} .side{position:static;height:auto;} .main{padding:20px;} }
+  @media (max-width:760px){ .shell{grid-template-columns:1fr;} .side{position:static;height:auto;} .main{padding:22px;} }
 </style>
 </head>
 <body>
@@ -43,7 +42,7 @@
   <div class="card card--pad" style="max-width:420px;">
     <div class="brand" style="justify-content:center;margin-bottom:16px;"><span class="logo">📚</span> JCABSS <small>AI</small></div>
     <h2 style="font-size:1.5rem;">Admin area</h2>
-    <p class="muted" id="gateMsg" style="margin:10px 0 18px;">Checking access…</p>
+    <p class="muted" id="gateMsg" style="margin:10px 0 18px;">Checking your access…</p>
     <a class="btn btn--primary" href="index.html" id="gateBtn" style="display:none;">Go to login</a>
   </div>
 </div>
@@ -53,44 +52,62 @@
     <div class="brand"><span class="logo">📚</span> JCABSS</div>
     <div class="tag">ADMIN</div>
     <a class="nav-link" href="admin.html"><span class="ic">🏫</span> Schools & Students</a>
-    <a class="nav-link active"><span class="ic">📖</span> Exam Content</a>
+    <a class="nav-link active"><span class="ic">📝</span> Exam Content</a>
     <div class="spacer"></div>
     <a class="nav-link signout" id="signout"><span class="ic">↩︎</span> Sign Out</a>
   </nav>
   <main class="main">
     <h1 class="rise">Exam Content</h1>
-    <p class="muted rise" style="margin-bottom:20px;">Create exams, let AI draft topics & questions, then review and publish.</p>
+    <p class="muted rise" style="margin-bottom:22px;">Build the exam library. AI drafts it; you review and publish.</p>
     <div id="flash" class="flash"></div>
 
     <!-- exams -->
     <div class="card panel rise">
-      <h3>1 · Choose or create an exam</h3>
-      <div class="chip-row" id="examChips"></div>
-      <div class="row" style="margin-top:14px;">
+      <h3>📚 Exams</h3>
+      <div class="row">
         <div class="field"><label>New exam name</label><input class="input" id="examName" placeholder="e.g. JAMB"></div>
         <div class="field"><label>Level (optional)</label><input class="input" id="examLevel" placeholder="e.g. SS"></div>
-        <button class="btn btn--ghost" id="addExamBtn">Add exam</button>
+        <button class="btn btn--primary" id="addExamBtn">Add exam</button>
       </div>
+      <div class="chip-row" id="examChips" style="margin-top:14px;"></div>
     </div>
 
     <!-- subjects -->
     <div class="card panel rise" id="subjectPanel" style="display:none;">
-      <h3>2 · Subject in <span id="examCrumb" style="color:var(--emerald-d);"></span></h3>
-      <div class="chip-row" id="subjectChips"></div>
-      <div class="row" style="margin-top:14px;">
+      <h3>📘 Subjects in <span id="examLabel" style="color:var(--emerald-d);"></span></h3>
+      <div class="row">
         <div class="field"><label>New subject</label><input class="input" id="subjectName" placeholder="e.g. Biology"></div>
-        <button class="btn btn--ghost" id="addSubjectBtn">Add subject</button>
+        <button class="btn btn--primary" id="addSubjectBtn">Add subject</button>
       </div>
+      <div class="chip-row" id="subjectChips" style="margin-top:14px;"></div>
     </div>
 
     <!-- topics -->
     <div class="card panel rise" id="topicPanel" style="display:none;">
-      <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;">
-        <h3 style="margin:0;">3 · Topics in <span id="subjectCrumb" style="color:var(--emerald-d);"></span></h3>
-        <button class="btn btn--amber tiny-btn" id="genTopicsBtn">✨ AI: draft topics</button>
+      <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;">
+        <h3 style="margin:0;">🎯 Topics in <span id="subjectLabel" style="color:var(--emerald-d);"></span></h3>
+        <div style="display:flex;gap:8px;">
+          <button class="mini-btn green" id="genTopicsBtn">✨ Generate topics with AI</button>
+          <button class="mini-btn" id="publishAllBtn">Publish all topics</button>
+        </div>
       </div>
-      <p class="muted" style="font-size:.85rem;margin:8px 0 14px;">AI drafts are saved as <b>draft</b>. Edit, then Publish to make them visible to students.</p>
-      <div id="topicList"></div>
+      <p class="muted" style="font-size:.85rem;margin-top:8px;">AI creates drafts. Expand a topic to edit, generate questions, and publish.</p>
+      <div id="topicList" style="margin-top:16px;"></div>
+    </div>
+
+    <!-- past question files -->
+    <div class="card panel rise" id="pastPanel" style="display:none;">
+      <h3>📂 Past-question files <span style="color:var(--muted);font-weight:400;font-size:.85rem;">(uploaded papers students can download)</span></h3>
+      <p class="muted" style="font-size:.85rem;margin-bottom:12px;">⚠️ You are responsible for the rights to any file you upload here. Upload PDFs or images of past papers.</p>
+      <div class="row">
+        <div class="field" style="max-width:130px;"><label>Year</label><input class="input" id="pastYear" type="number" placeholder="2024"></div>
+        <div class="field"><label>File (PDF / image)</label><input class="input" id="pastFile" type="file" accept=".pdf,image/*"></div>
+        <button class="btn btn--primary" id="uploadPastBtn">Upload</button>
+      </div>
+      <div id="pastList" style="margin-top:14px;"></div>
+      <p class="muted" style="font-size:.82rem;margin-top:14px;border-top:1px dashed var(--line);padding-top:12px;">
+        💡 To make past questions <b>playable as a quiz</b>, expand a topic above and use “Generate questions”, then set their source — or add them manually. Files uploaded here are for download.
+      </p>
     </div>
   </main>
 </div>
@@ -99,7 +116,6 @@
 <script src="js/config.js"></script>
 <script src="js/session.js"></script>
 <script>
-  let exams=[], subjects=[], topics=[];
   let selExam=null, selSubject=null;
   function escapeHtml(s){ return (s||"").replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])); }
 
@@ -118,119 +134,229 @@
 
   async function checkAdmin(){
     const { data:{ session } } = await sb.auth.getSession();
-    if(!session){ $("#gateMsg").textContent="Log in as admin first."; $("#gateBtn").style.display="inline-flex"; return; }
+    if(!session){ $("#gateMsg").textContent="You must be logged in as the admin."; $("#gateBtn").style.display="inline-flex"; return; }
     const { data: prof } = await sb.from("profiles").select("role").eq("id", session.user.id).maybeSingle();
-    if(!prof || prof.role!=="admin"){ $("#gateMsg").textContent="Not an admin account."; $("#gateBtn").style.display="inline-flex"; return; }
-    $("#gate").style.display="none"; $("#app").style.display="grid";
-    loadExams();
+    if(!prof || prof.role!=="admin"){ $("#gateMsg").textContent="This account is not an admin."; $("#gateBtn").style.display="inline-flex"; return; }
+    $("#gate").style.display="none"; $("#app").style.display="grid"; loadExams();
   }
   $("#signout").addEventListener("click", logoutLearner);
 
   // ---- exams ----
-  async function loadExams(){
-    try{ exams=(await admin("list_exams")).exams; renderExams(); }catch(e){ flash($("#flash"),e.message); }
-  }
-  function renderExams(){
-    const c=$("#examChips");
-    c.innerHTML = exams.length ? exams.map(e=>`<button class="chip ${selExam&&selExam.id===e.id?'sel':''}" data-id="${e.id}">${escapeHtml(e.name)}</button>`).join("") : '<span class="muted">No exams yet — add one below.</span>';
-    $all("#examChips .chip").forEach(b=>b.addEventListener("click",()=>{ selExam=exams.find(x=>x.id===b.dataset.id); selSubject=null; renderExams(); openSubjects(); }));
-  }
   $("#addExamBtn").addEventListener("click", async ()=>{
-    const name=$("#examName").value.trim(); if(!name){ flash($("#flash"),"Enter an exam name."); return; }
-    const level=$("#examLevel").value.trim()||null;
-    try{ await admin("create_exam",{name,level}); $("#examName").value=""; $("#examLevel").value=""; flash($("#flash"),"Exam added.","success"); loadExams(); }catch(e){ flash($("#flash"),e.message); }
+    const name=$("#examName").value.trim(), level=$("#examLevel").value.trim()||null;
+    if(!name){ flash($("#flash"),"Exam name required."); return; }
+    try{ await admin("create_exam",{name,level}); $("#examName").value=""; $("#examLevel").value=""; flash($("#flash"),"Exam added.","success"); loadExams(); }
+    catch(e){ flash($("#flash"), e.message); }
   });
+  async function loadExams(){
+    try{
+      const { exams } = await admin("list_exams");
+      const box=$("#examChips");
+      if(!exams.length){ box.innerHTML='<span class="muted">No exams yet. Add one above (e.g. JAMB, WAEC).</span>'; return; }
+      box.innerHTML="";
+      exams.forEach(e=>{
+        const c=document.createElement("button"); c.className="chip"+(selExam&&selExam.id===e.id?" sel":"");
+        c.textContent=e.name+(e.level?` · ${e.level}`:""); c.addEventListener("click",()=>selectExam(e)); box.appendChild(c);
+      });
+    }catch(e){ flash($("#flash"), e.message); }
+  }
+  function selectExam(e){ selExam=e; selSubject=null; loadExams();
+    $("#subjectPanel").style.display="block"; $("#examLabel").textContent=e.name;
+    $("#topicPanel").style.display="none"; loadSubjects(); }
 
   // ---- subjects ----
-  async function openSubjects(){
-    $("#subjectPanel").style.display="block"; $("#topicPanel").style.display="none";
-    $("#examCrumb").textContent=selExam.name;
-    try{ subjects=(await admin("list_subjects",{examId:selExam.id})).subjects; renderSubjects(); }catch(e){ flash($("#flash"),e.message); }
-  }
-  function renderSubjects(){
-    const c=$("#subjectChips");
-    c.innerHTML = subjects.length ? subjects.map(s=>`<button class="chip ${selSubject&&selSubject.id===s.id?'sel':''}" data-id="${s.id}">${escapeHtml(s.name)}</button>`).join("") : '<span class="muted">No subjects yet — add one below.</span>';
-    $all("#subjectChips .chip").forEach(b=>b.addEventListener("click",()=>{ selSubject=subjects.find(x=>x.id===b.dataset.id); renderSubjects(); openTopics(); }));
-  }
   $("#addSubjectBtn").addEventListener("click", async ()=>{
-    const name=$("#subjectName").value.trim(); if(!name){ flash($("#flash"),"Enter a subject."); return; }
-    try{ await admin("create_subject",{examId:selExam.id,name}); $("#subjectName").value=""; flash($("#flash"),"Subject added.","success"); openSubjects(); }catch(e){ flash($("#flash"),e.message); }
+    const name=$("#subjectName").value.trim();
+    if(!name){ flash($("#flash"),"Subject name required."); return; }
+    try{ await admin("create_subject",{examId:selExam.id,name}); $("#subjectName").value=""; loadSubjects(); }
+    catch(e){ flash($("#flash"), e.message); }
   });
+  async function loadSubjects(){
+    try{
+      const { subjects } = await admin("list_subjects",{examId:selExam.id});
+      const box=$("#subjectChips");
+      if(!subjects.length){ box.innerHTML='<span class="muted">No subjects yet. Add one (e.g. Biology).</span>'; return; }
+      box.innerHTML="";
+      subjects.forEach(s=>{
+        const c=document.createElement("button"); c.className="chip"+(selSubject&&selSubject.id===s.id?" sel":"");
+        c.textContent=s.name; c.addEventListener("click",()=>selectSubject(s)); box.appendChild(c);
+      });
+    }catch(e){ flash($("#flash"), e.message); }
+  }
+  function selectSubject(s){ selSubject=s; loadSubjects();
+    $("#topicPanel").style.display="block"; $("#subjectLabel").textContent=`${selExam.name} · ${s.name}`;
+    $("#pastPanel").style.display="block";
+    loadTopics(); loadPastFiles(); $("#topicPanel").scrollIntoView({behavior:"smooth"}); }
 
   // ---- topics ----
-  async function openTopics(){
-    $("#topicPanel").style.display="block"; $("#subjectCrumb").textContent=selSubject.name;
-    try{ topics=(await admin("list_topics",{subjectId:selSubject.id})).topics; renderTopics(); }catch(e){ flash($("#flash"),e.message); }
-  }
-  function renderTopics(){
-    const list=$("#topicList");
-    if(!topics.length){ list.innerHTML='<p class="muted">No topics yet. Click "AI: draft topics" to generate some.</p>'; return; }
-    list.innerHTML="";
-    topics.forEach(t=>{
-      const card=document.createElement("div"); card.className="topic-card";
-      card.innerHTML=`
-        <div class="th">
-          <span class="title">${escapeHtml(t.title)}</span>
-          <span style="display:flex;gap:8px;align-items:center;">
-            <span class="badge ${t.status}">${t.status}</span>
-            <span class="mini toggle">expand ▾</span>
-          </span>
-        </div>
-        <div class="body">
-          <div class="field"><label>Summary</label><textarea class="input s">${escapeHtml(t.summary||"")}</textarea></div>
-          <div class="field"><label>Key points (one per line, start with -)</label><textarea class="input bp">${escapeHtml(t.bullet_points||"")}</textarea></div>
-          <div class="field"><label>Focus note</label><input class="input fn" value="${escapeHtml(t.focus_note||"")}"></div>
-          <div class="row" style="gap:8px;">
-            <button class="btn btn--primary tiny-btn save">💾 Save</button>
-            ${t.status!=="published"?'<button class="btn btn--amber tiny-btn pub">✅ Publish</button>':'<button class="btn btn--ghost tiny-btn unpub">↩ Unpublish</button>'}
-            <button class="btn btn--ghost tiny-btn genq">✨ Generate questions</button>
-            <button class="mini del" style="margin-left:auto;">Delete</button>
-          </div>
-          <div class="qbox" style="margin-top:12px;"></div>
-        </div>`;
-      const body=card.querySelector(".body");
-      card.querySelector(".toggle").addEventListener("click",()=>{ card.classList.toggle("open"); card.querySelector(".toggle").textContent=card.classList.contains("open")?"collapse ▴":"expand ▾"; });
-      card.querySelector(".save").addEventListener("click",async()=>{
-        try{ await admin("update_topic",{topicId:t.id,fields:{ summary:body.querySelector(".s").value, bullet_points:body.querySelector(".bp").value, focus_note:body.querySelector(".fn").value }}); flash($("#flash"),"Saved.","success"); }catch(e){ flash($("#flash"),e.message); }
-      });
-      const pub=card.querySelector(".pub"); if(pub) pub.addEventListener("click",async()=>{ try{ await admin("update_topic",{topicId:t.id,fields:{status:"published"}}); openTopics(); }catch(e){ flash($("#flash"),e.message); } });
-      const unpub=card.querySelector(".unpub"); if(unpub) unpub.addEventListener("click",async()=>{ try{ await admin("update_topic",{topicId:t.id,fields:{status:"draft"}}); openTopics(); }catch(e){ flash($("#flash"),e.message); } });
-      card.querySelector(".del").addEventListener("click",async()=>{ if(!confirm("Delete this topic?")) return; try{ await admin("delete_topic",{topicId:t.id}); openTopics(); }catch(e){ flash($("#flash"),e.message); } });
-      card.querySelector(".genq").addEventListener("click",()=>genQuestions(t, card.querySelector(".qbox")));
-      list.appendChild(card);
-    });
+  $("#genTopicsBtn").addEventListener("click", async ()=>{
+    const btn=$("#genTopicsBtn"); btn.disabled=true; const o=btn.textContent; btn.innerHTML='<span class="spinner"></span> Generating…';
+    try{
+      const { topics } = await ai({ action:"exam_topics", examName:selExam.name, subjectName:selSubject.name, level:selExam.level||"" });
+      if(!topics.length) throw new Error("AI returned no topics. Try again.");
+      const res = await admin("save_topics",{ subjectId:selSubject.id, topics });
+      flash($("#flash"),`Added ${res.count} draft topics. Review and publish below.`,"success"); loadTopics();
+    }catch(e){ flash($("#flash"), e.message); }
+    finally{ btn.disabled=false; btn.textContent=o; }
+  });
+  $("#publishAllBtn").addEventListener("click", async ()=>{
+    if(!confirm("Publish ALL topics in this subject? Students will see them.")) return;
+    try{ await admin("bulk_publish",{kind:"topics",subjectId:selSubject.id,status:"published"}); flash($("#flash"),"All topics published.","success"); loadTopics(); }
+    catch(e){ flash($("#flash"), e.message); }
+  });
+
+  async function loadTopics(){
+    try{
+      const { topics } = await admin("list_topics",{subjectId:selSubject.id});
+      const box=$("#topicList");
+      if(!topics.length){ box.innerHTML='<p class="muted">No topics yet. Click “Generate topics with AI”.</p>'; return; }
+      box.innerHTML="";
+      topics.forEach(t=>box.appendChild(renderTopic(t)));
+    }catch(e){ flash($("#flash"), e.message); }
   }
 
-  $("#genTopicsBtn").addEventListener("click", async ()=>{
-    const btn=$("#genTopicsBtn"); btn.disabled=true; const o=btn.textContent; btn.innerHTML='<span class="spinner"></span> Drafting…';
+  function renderTopic(t){
+    const el=document.createElement("div"); el.className="topic-card";
+    const stClass = t.status==="published"?"st-published":(t.status==="review"?"st-review":"st-draft");
+    el.innerHTML=`
+      <div class="thead">
+        <h4>${escapeHtml(t.title)}</h4>
+        <div class="meta">
+          <span class="status-pill ${stClass}">${t.status}</span>
+          <button class="mini-btn" data-toggle>Expand</button>
+        </div>
+      </div>
+      <div class="topic-body">
+        <div class="field"><label>Title</label><input class="input" data-f="title" value="${escapeHtml(t.title)}"></div>
+        <div class="field"><label>Summary</label><textarea class="input" data-f="summary">${escapeHtml(t.summary||"")}</textarea></div>
+        <div class="field"><label>Key points (one per line, start with -)</label><textarea class="input" data-f="bullet_points">${escapeHtml(t.bullet_points||"")}</textarea></div>
+        <div class="field"><label>Where to focus</label><textarea class="input" data-f="focus_note">${escapeHtml(t.focus_note||"")}</textarea></div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px;">
+          <button class="mini-btn" data-save>💾 Save edits</button>
+          <button class="mini-btn green" data-publish>${t.status==="published"?"Unpublish":"✓ Publish"}</button>
+          <button class="mini-btn" data-genq>✨ Generate AI questions</button>
+          <button class="mini-btn" data-addpast>➕ Add past question</button>
+          <button class="mini-btn" data-delete>🗑 Delete</button>
+        </div>
+        <div data-pastform style="display:none;border:1px dashed var(--line);border-radius:10px;padding:14px;margin-bottom:12px;">
+          <b style="font-size:.9rem;">Add a real past question (playable)</b>
+          <div class="field" style="margin-top:8px;"><label>Question</label><textarea class="input" data-pq="question" style="min-height:60px;"></textarea></div>
+          <div class="field"><label>Option A</label><input class="input" data-pq="a"></div>
+          <div class="field"><label>Option B</label><input class="input" data-pq="b"></div>
+          <div class="field"><label>Option C</label><input class="input" data-pq="c"></div>
+          <div class="field"><label>Option D</label><input class="input" data-pq="d"></div>
+          <div class="row">
+            <div class="field" style="max-width:160px;"><label>Correct option</label><select class="input" data-pq="correct"><option value="0">A</option><option value="1">B</option><option value="2">C</option><option value="3">D</option></select></div>
+            <div class="field" style="max-width:130px;"><label>Year</label><input class="input" data-pq="year" type="number" placeholder="2024"></div>
+            <button class="mini-btn green" data-savepast>Save question</button>
+          </div>
+        </div>
+        <div data-questions></div>
+      </div>`;
+    const body=el.querySelector(".topic-body");
+    el.querySelector("[data-toggle]").addEventListener("click",(ev)=>{ body.classList.toggle("open"); ev.target.textContent=body.classList.contains("open")?"Collapse":"Expand"; if(body.classList.contains("open")) loadQuestions(t.id, el.querySelector("[data-questions]")); });
+    el.querySelector("[data-save]").addEventListener("click", async ()=>{
+      const fields={}; el.querySelectorAll("[data-f]").forEach(i=>fields[i.dataset.f]=i.value);
+      try{ await admin("update_topic",{topicId:t.id,fields}); flash($("#flash"),"Saved.","success"); }catch(e){ flash($("#flash"),e.message); }
+    });
+    el.querySelector("[data-publish]").addEventListener("click", async ()=>{
+      const newStatus=t.status==="published"?"draft":"published";
+      try{ await admin("update_topic",{topicId:t.id,fields:{status:newStatus}}); loadTopics(); }catch(e){ flash($("#flash"),e.message); }
+    });
+    el.querySelector("[data-delete]").addEventListener("click", async ()=>{
+      if(!confirm("Delete this topic and its questions?")) return;
+      try{ await admin("delete_topic",{topicId:t.id}); loadTopics(); }catch(e){ flash($("#flash"),e.message); }
+    });
+    el.querySelector("[data-genq]").addEventListener("click", async (ev)=>{
+      const b=ev.target; b.disabled=true; const o=b.textContent; b.innerHTML='<span class="spinner"></span>';
+      try{
+        const { questions } = await ai({ action:"exam_questions", examName:selExam.name, subjectName:selSubject.name, topicTitle:t.title, count:10 });
+        if(!questions.length) throw new Error("No questions generated.");
+        await admin("save_questions",{ topicId:t.id, subjectId:selSubject.id, questions, source:"ai" });
+        flash($("#flash"),`Added ${questions.length} draft questions.`,"success");
+        loadQuestions(t.id, el.querySelector("[data-questions]"));
+      }catch(e){ flash($("#flash"),e.message); }
+      finally{ b.disabled=false; b.textContent=o; }
+    });
+    // toggle the manual past-question form
+    el.querySelector("[data-addpast]").addEventListener("click",()=>{
+      const f=el.querySelector("[data-pastform]"); f.style.display=f.style.display==="none"?"block":"none";
+    });
+    // save a manual past question
+    el.querySelector("[data-savepast]").addEventListener("click", async ()=>{
+      const get=(k)=>el.querySelector(`[data-pq="${k}"]`).value.trim();
+      const question=get("question"), a=get("a"), b=get("b"), c=get("c"), d=get("d");
+      const correct=parseInt(el.querySelector('[data-pq="correct"]').value);
+      const year=get("year");
+      if(!question||!a||!b||!c||!d){ flash($("#flash"),"Fill the question and all four options."); return; }
+      try{
+        await admin("save_questions",{ topicId:t.id, subjectId:selSubject.id, source:"past_question", year: year?parseInt(year):null,
+          questions:[{ question, options:[a,b,c,d], correctAnswer:correct }] });
+        flash($("#flash"),"Past question added (as draft). Publish it below.","success");
+        el.querySelectorAll("[data-pq]").forEach(i=>{ if(i.tagName!=="SELECT") i.value=""; });
+        loadQuestions(t.id, el.querySelector("[data-questions]"));
+      }catch(e){ flash($("#flash"), e.message); }
+    });
+    return el;
+  }
+
+  async function loadQuestions(topicId, container){
+    container.innerHTML='<p class="muted" style="font-size:.85rem;">Loading questions…</p>';
     try{
-      const res=await ai({ action:"exam_topics", examName:selExam.name, subjectName:selSubject.name, level:selExam.level||"" });
-      if(!res.topics||!res.topics.length) throw new Error("AI returned no topics. Try again.");
-      await admin("save_topics",{subjectId:selSubject.id, topics:res.topics});
-      flash($("#flash"),`Drafted ${res.topics.length} topics. Review and publish below.`,"success");
-      openTopics();
-    }catch(e){ flash($("#flash"),e.message); }
+      const { questions } = await admin("list_questions",{topicId});
+      if(!questions.length){ container.innerHTML='<p class="muted" style="font-size:.85rem;">No questions yet. Click “Generate questions”.</p>'; return; }
+      const published=questions.filter(q=>q.status==="published").length;
+      container.innerHTML=`<div style="display:flex;justify-content:space-between;align-items:center;margin:8px 0;">
+        <b style="font-size:.9rem;">${questions.length} questions · ${published} published</b>
+        <button class="mini-btn green" id="pubQ-${topicId}">Publish all questions</button></div>`;
+      questions.forEach(q=>{
+        const d=document.createElement("div"); d.className="q-item";
+        const opts=(q.options||[]).map((o,i)=>`<div${i===q.correct_answer?' class="correct"':''}>${String.fromCharCode(65+i)}. ${escapeHtml(o)}${i===q.correct_answer?' ✓':''}</div>`).join("");
+        d.innerHTML=`<div><b>${escapeHtml(q.question)}</b> <span class="status-pill ${q.status==='published'?'st-published':'st-draft'}">${q.status}</span></div><div class="opts">${opts}</div>`;
+        container.appendChild(d);
+      });
+      $("#pubQ-"+topicId).addEventListener("click", async ()=>{
+        try{ for(const q of questions){ if(q.status!=="published") await admin("update_question",{questionId:q.id,fields:{status:"published"}}); } flash($("#flash"),"Questions published.","success"); loadQuestions(topicId,container); }
+        catch(e){ flash($("#flash"),e.message); }
+      });
+    }catch(e){ container.innerHTML=`<p class="muted">${escapeHtml(e.message)}</p>`; }
+  }
+
+  // ---- past question files ----
+  $("#uploadPastBtn").addEventListener("click", async ()=>{
+    const file=$("#pastFile").files[0], year=$("#pastYear").value.trim();
+    if(!file){ flash($("#flash"),"Choose a file to upload."); return; }
+    const btn=$("#uploadPastBtn"); btn.disabled=true; const o=btn.textContent; btn.innerHTML='<span class="spinner"></span> Uploading…';
+    try{
+      // upload to Storage bucket "past-questions"
+      const safe=file.name.replace(/[^a-zA-Z0-9._-]/g,"_");
+      const path=`${selExam.id}/${selSubject.id}/${Date.now()}_${safe}`;
+      const { error: upErr } = await sb.storage.from("past-questions").upload(path, file, { upsert:false });
+      if(upErr) throw new Error("Upload failed: "+upErr.message);
+      const { data: pub } = sb.storage.from("past-questions").getPublicUrl(path);
+      await admin("add_past_file",{ examId:selExam.id, subjectId:selSubject.id, year: year?parseInt(year):null, fileUrl: pub.publicUrl });
+      $("#pastFile").value=""; $("#pastYear").value="";
+      flash($("#flash"),"Past-question file uploaded.","success"); loadPastFiles();
+    }catch(e){ flash($("#flash"), e.message); }
     finally{ btn.disabled=false; btn.textContent=o; }
   });
 
-  async function genQuestions(topic, box){
-    box.innerHTML='<span class="muted">Generating questions… <span class="spinner" style="border-top-color:var(--emerald);"></span></span>';
+  async function loadPastFiles(){
     try{
-      const res=await ai({ action:"exam_questions", examName:selExam.name, subjectName:selSubject.name, topicTitle:topic.title, count:10 });
-      if(!res.questions||!res.questions.length){ box.innerHTML='<span class="muted">No questions generated.</span>'; return; }
-      await admin("save_questions",{subjectId:selSubject.id, topicId:topic.id, questions:res.questions, source:"ai"});
-      box.innerHTML=`<p class="mini" style="color:var(--emerald-d);margin-bottom:8px;">✅ Saved ${res.questions.length} questions (draft). Publish them below.</p>`+
-        res.questions.map(q=>`<div class="q-item">${escapeHtml(q.question)}<div class="opts">${q.options.map((o,i)=>`${i===q.correctAnswer?'<span class="correct">✓ '+escapeHtml(o)+'</span>':escapeHtml(o)}`).join(" · ")}</div></div>`).join("")+
-        `<button class="btn btn--amber tiny-btn pubq" style="margin-top:8px;">✅ Publish these questions</button>`;
-      box.querySelector(".pubq").addEventListener("click",async()=>{
-        try{
-          const { questions } = await admin("list_questions",{subjectId:selSubject.id, topicId:topic.id});
-          const draftIds=questions.filter(q=>q.status!=="published").map(q=>q.id);
-          if(draftIds.length){ await admin("set_status",{kind:"exam_questions", ids:draftIds, status:"published"}); }
-          flash($("#flash"),"Questions published.","success");
-        }catch(e){ flash($("#flash"),e.message); }
+      const { files } = await admin("list_past_files",{subjectId:selSubject.id});
+      const box=$("#pastList");
+      if(!files.length){ box.innerHTML='<p class="muted" style="font-size:.85rem;">No past-question files yet.</p>'; return; }
+      box.innerHTML="";
+      files.forEach(f=>{
+        const el=document.createElement("div"); el.style.cssText="display:flex;align-items:center;gap:12px;padding:10px 14px;border:1px solid var(--line);border-radius:10px;margin-bottom:8px;";
+        el.innerHTML=`<span style="font-size:1.2rem;">📄</span><div style="flex:1;"><b>${f.year||"Undated"}</b> <a href="${f.file_url}" target="_blank" style="font-size:.85rem;">view file ↗</a></div><button class="mini-btn" data-del>Delete</button>`;
+        el.querySelector("[data-del]").addEventListener("click", async ()=>{
+          if(!confirm("Delete this file record?")) return;
+          try{ await admin("delete_past_file",{fileId:f.id}); loadPastFiles(); }catch(e){ flash($("#flash"),e.message); }
+        });
+        box.appendChild(el);
       });
-    }catch(e){ box.innerHTML=`<span class="flash flash--error" style="display:block;">${escapeHtml(e.message)}</span>`; }
+    }catch(e){ $("#pastList").innerHTML=`<p class="muted">${escapeHtml(e.message)}</p>`; }
   }
 
   checkAdmin();

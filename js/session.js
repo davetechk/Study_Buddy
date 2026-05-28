@@ -166,14 +166,15 @@ async function examTopic(learner, topicId) {
   const { data } = await sb.from("topics").select("*").eq("id", topicId).eq("status","published").maybeSingle();
   return data;
 }
-async function examStartQuiz(learner, { topicId, subjectId, count }) {
-  if (learner.type === "student") return (await studentData("exam_start_quiz",{topicId,subjectId,count})).quiz;
+async function examStartQuiz(learner, { topicId, subjectId, count, source }) {
+  if (learner.type === "student") return (await studentData("exam_start_quiz",{topicId,subjectId,count,source})).quiz;
   // visitor path: read published questions directly, build quiz row
   let q = sb.from("exam_questions").select("*").eq("status","published");
   if (topicId) q = q.eq("topic_id", topicId); else q = q.eq("subject_id", subjectId);
+  if (source === "past_question" || source === "ai") q = q.eq("source", source);
   const { data } = await q;
   let pool = (data||[]).slice();
-  if (!pool.length) throw new Error("No published questions available yet for this selection.");
+  if (!pool.length) throw new Error(source==="past_question" ? "No past-paper questions available yet for this selection." : "No published questions available yet for this selection.");
   for (let i=pool.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [pool[i],pool[j]]=[pool[j],pool[i]]; }
   const n = Math.min(Math.max(parseInt(count)||10,1), pool.length);
   const chosen = pool.slice(0,n).map(r=>({ question:r.question, options:r.options, correctAnswer:r.correct_answer, explanation:r.explanation||null }));
@@ -183,4 +184,10 @@ async function examStartQuiz(learner, { topicId, subjectId, count }) {
   }).select().single();
   if (error) throw error;
   return quiz;
+}
+
+async function examPastFiles(learner, subjectId) {
+  if (learner.type === "student") return (await studentData("exam_past_files",{subjectId})).files;
+  const { data } = await sb.from("past_question_files").select("id,year,file_url").eq("subject_id", subjectId).order("year",{ascending:false});
+  return data || [];
 }
