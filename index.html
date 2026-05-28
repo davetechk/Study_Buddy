@@ -176,14 +176,14 @@
       }
       if(data && data.error) throw new Error(data.error);
       saveStudentSession(data.token, data.user);
-      go("dashboard.html");
+      go(data.user.type === "teacher" ? "teacher.html" : "dashboard.html");
     }catch(err){ flash(flashEl, err.message||"Login failed."); btn.disabled=false; btn.textContent=o; }
   }
   $("#sSubmit").addEventListener("click", schoolSubmit);
   $("#sPass").addEventListener("keydown",e=>{ if(e.key==="Enter") schoolSubmit(); });
 
   // already logged in?
-  (async ()=>{ const l=await currentLearner(); if(l) go("dashboard.html"); })();
+  (async ()=>{ const l=await currentLearner(); if(l) go(l.type==="teacher" ? "teacher.html" : "dashboard.html"); })();
   renderVisitor();
 </script>
 </body>

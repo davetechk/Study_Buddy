@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Teacher — JCABSS AI</title>
+<link rel="stylesheet" href="styles.css">
+<style>
+  .shell { display:grid; grid-template-columns:240px 1fr; min-height:100vh; }
+  .side { background:var(--ink); color:var(--paper); padding:24px 18px; display:flex; flex-direction:column; gap:6px; position:sticky; top:0; height:100vh; }
+  .side .brand { color:#fff; margin-bottom:6px; font-size:1.1rem; } .side .tag { color:#f4c578; font-size:.75rem; margin-bottom:20px; }
+  .nav-link { display:flex; align-items:center; gap:12px; padding:12px 14px; border-radius:12px; color:#b9cdc5; font-weight:500; cursor:pointer; }
+  .nav-link.active { background:var(--emerald); color:#fff; } .side .spacer{flex:1;} .side .signout{color:#8fa69d;font-size:.9rem;}
+  .main { padding:34px 38px; max-width:900px; }
+  .main h1 { font-size:2rem; margin-bottom:4px; }
+  .panel { padding:24px; margin-bottom:20px; } .panel h3 { font-size:1.15rem; margin-bottom:12px; }
+  .hint { background:rgba(17,128,106,.08); border:1px solid #b9dccf; color:#0c5f4f; padding:12px 15px; border-radius:12px; font-size:.9rem; margin-bottom:18px; line-height:1.55; }
+  .mat-row { display:flex; align-items:center; gap:14px; padding:14px 18px; border:1px solid var(--line); border-radius:12px; margin-bottom:10px; }
+  .mat-row .ic { width:40px; height:40px; border-radius:10px; background:rgba(17,128,106,.12); display:grid; place-items:center; font-size:1.2rem; }
+  .mat-row .body { flex:1; } .mat-row .body b { display:block; } .mat-row .body span { color:var(--muted); font-size:.85rem; }
+  .mat-row .del { background:none; border:none; color:var(--rose); cursor:pointer; font-weight:600; }
+  .gate { min-height:100vh; display:grid; place-items:center; padding:24px; text-align:center; }
+  @media (max-width:760px){ .shell{grid-template-columns:1fr;} .side{position:static;height:auto;} .main{padding:22px;} }
+</style>
+</head>
+<body>
+<div id="gate" class="gate">
+  <div class="card card--pad" style="max-width:420px;">
+    <div class="brand" style="justify-content:center;margin-bottom:16px;"><span class="logo">📚</span> JCABSS <small>AI</small></div>
+    <h2 style="font-size:1.5rem;">Teacher area</h2>
+    <p class="muted" id="gateMsg" style="margin:10px 0 18px;">Checking your access…</p>
+    <a class="btn btn--primary" href="index.html" id="gateBtn" style="display:none;">Go to login</a>
+  </div>
+</div>
+
+<div class="shell" id="app" style="display:none;">
+  <nav class="side">
+    <div class="brand"><span class="logo">📚</span> JCABSS</div>
+    <div class="tag" id="schoolTag">TEACHER</div>
+    <a class="nav-link active"><span class="ic">📁</span> My Materials</a>
+    <div class="spacer"></div>
+    <a class="nav-link signout" id="signout"><span class="ic">↩︎</span> Sign Out</a>
+  </nav>
+  <main class="main">
+    <h1 class="rise">Welcome, <span id="tName">Teacher</span></h1>
+    <p class="muted rise" style="margin-bottom:20px;" id="tSub">Upload subject material to help your students learn.</p>
+    <div id="flash" class="flash"></div>
+
+    <div class="hint rise">💡 When a student at your school creates a note in a subject you've uploaded material for, the AI blends your material into their summary and quiz — so your teaching shapes what they study.</div>
+
+    <div class="card panel rise">
+      <h3>➕ Upload material</h3>
+      <div class="field"><label>Subject</label><input class="input" id="mSubject" placeholder="e.g. Biology (must match the subject students tag)"></div>
+      <div class="field"><label>Title</label><input class="input" id="mTitle" placeholder="e.g. Photosynthesis — class notes"></div>
+      <div class="field"><label>Material content</label><textarea class="input" id="mContent" placeholder="Paste your lesson notes, explanations, key facts…" style="min-height:160px;"></textarea></div>
+      <button class="btn btn--primary btn--block" id="uploadBtn">Upload material</button>
+    </div>
+
+    <div class="card panel rise">
+      <h3>📁 Your uploaded materials</h3>
+      <div id="matList"><p class="muted">Loading…</p></div>
+    </div>
+  </main>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="js/config.js"></script>
+<script src="js/session.js"></script>
+<script>
+  function escapeHtml(s){ return (s||"").replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])); }
+
+  async function teacherData(action, payload={}){
+    const token=getStudentToken();
+    const { data, error } = await sb.functions.invoke("teacher-data", { body:{action,payload}, headers:{ "X-Student-Token": token||"" } });
+    if(error){ let m=error.message||"Request failed"; try{ if(error.context&&error.context.json){ const j=await error.context.json(); if(j&&j.error) m=j.error; } }catch(e){} throw new Error(m); }
+    if(data && data.error) throw new Error(data.error);
+    return data;
+  }
+
+  async function init(){
+    const u = getStudentUser();
+    if(!u || u.type!=="teacher"){ $("#gateMsg").textContent="Please log in as a teacher."; $("#gateBtn").style.display="inline-flex"; return; }
+    $("#gate").style.display="none"; $("#app").style.display="grid";
+    $("#tName").textContent = u.name || "Teacher";
+    try{ const p=await teacherData("my_profile"); if(p.schoolName){ $("#schoolTag").textContent=p.schoolName.toUpperCase(); $("#tSub").textContent=`${p.schoolName} · Upload subject material to help your students learn.`; } }catch(e){}
+    loadMaterials();
+  }
+  $("#signout").addEventListener("click", logoutLearner);
+
+  $("#uploadBtn").addEventListener("click", async ()=>{
+    const subject=$("#mSubject").value.trim(), title=$("#mTitle").value.trim(), content=$("#mContent").value.trim();
+    if(!subject||!title||!content){ flash($("#flash"),"Subject, title and content are all required."); return; }
+    const btn=$("#uploadBtn"); btn.disabled=true; const o=btn.textContent; btn.innerHTML='<span class="spinner"></span> Uploading…';
+    try{
+      await teacherData("create_material",{subject,title,content});
+      $("#mSubject").value=""; $("#mTitle").value=""; $("#mContent").value="";
+      flash($("#flash"),"Material uploaded. Your students will benefit from it.","success");
+      loadMaterials();
+    }catch(e){ flash($("#flash"), e.message); }
+    finally{ btn.disabled=false; btn.textContent=o; }
+  });
+
+  async function loadMaterials(){
+    try{
+      const { materials } = await teacherData("list_materials");
+      const box=$("#matList");
+      if(!materials.length){ box.innerHTML='<p class="muted">No materials uploaded yet.</p>'; return; }
+      box.innerHTML="";
+      materials.forEach(m=>{
+        const el=document.createElement("div"); el.className="mat-row";
+        el.innerHTML=`<div class="ic">📄</div><div class="body"><b>${escapeHtml(m.title)}</b><span>${escapeHtml(m.subject)} · ${niceDate(m.created_at)}</span></div><button class="del">Delete</button>`;
+        el.querySelector(".del").addEventListener("click", async ()=>{
+          if(!confirm("Delete this material?")) return;
+          try{ await teacherData("delete_material",{id:m.id}); loadMaterials(); }catch(e){ flash($("#flash"),e.message); }
+        });
+        box.appendChild(el);
+      });
+    }catch(e){ $("#matList").innerHTML=`<p class="muted">${escapeHtml(e.message)}</p>`; }
+  }
+
+  init();
+</script>
+</body>
+</html>

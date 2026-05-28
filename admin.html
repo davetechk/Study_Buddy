@@ -48,6 +48,7 @@
     <div class="brand"><span class="logo">📚</span> JCABSS</div>
     <div class="tag">ADMIN</div>
     <a class="nav-link active"><span class="ic">🏫</span> Schools & Students</a>
+    <a class="nav-link" href="admin-exams.html"><span class="ic">📝</span> Exam Content</a>
     <a class="nav-link" href="admin-exams.html"><span class="ic">📖</span> Exam Content</a>
     <div class="spacer"></div>
     <a class="nav-link signout" id="signout"><span class="ic">↩︎</span> Sign Out</a>
@@ -97,6 +98,22 @@
         </div>
         <div style="max-height:260px;overflow:auto;"><table id="resultTable"></table></div>
         <p class="muted" style="margin-top:10px;font-size:.85rem;">⚠️ This is the only time these passwords are shown. Download and keep them safe before leaving this page.</p>
+      </div>
+    </div>
+
+    <!-- add teachers -->
+    <div class="card panel rise" id="teacherPanel" style="display:none;">
+      <h3>🧑‍🏫 Add teachers to <span id="teacherSchoolName" style="color:var(--emerald-d);"></span></h3>
+      <div class="field"><label>Teacher names, one per line</label><textarea class="input" id="teacherNames" placeholder="Mr Adewale&#10;Mrs Okonkwo&#10;Mr Bello"></textarea></div>
+      <button class="btn btn--amber" id="addTeachersBtn">Generate teacher logins</button>
+      <div id="tResultBox" style="display:none;" class="result-box">
+        <b id="tResultSummary"></b>
+        <div style="margin:12px 0;">
+          <button class="btn btn--primary" id="tDlCsv">⬇ Download CSV</button>
+          <button class="btn btn--ghost" id="tDlPdf">⬇ Download PDF</button>
+        </div>
+        <div style="max-height:260px;overflow:auto;"><table id="tResultTable"></table></div>
+        <p class="muted" style="margin-top:10px;font-size:.85rem;">⚠️ Only shown once. Download and give each teacher their name + password.</p>
       </div>
     </div>
   </main>
@@ -158,6 +175,9 @@
     $("#importPanel").style.display="block";
     $("#importSchoolName").textContent=s.name;
     $("#resultBox").style.display="none";
+    $("#teacherPanel").style.display="block";
+    $("#teacherSchoolName").textContent=s.name;
+    $("#tResultBox").style.display="none";
     $("#importPanel").scrollIntoView({behavior:"smooth"});
   }
 
@@ -219,6 +239,37 @@
       doc.text(String(c.name).slice(0,55),14,y); doc.text(String(c.password),120,y); y+=8;
     });
     doc.save(`${selectedSchool.code}-logins.pdf`);
+  });
+
+  // ---- teachers ----
+  let lastTeachers=[];
+  $("#addTeachersBtn").addEventListener("click", async ()=>{
+    if(!selectedSchool){ flash($("#flash"),"Select a school first."); return; }
+    const names=$("#teacherNames").value.split("\n").map(s=>s.trim()).filter(Boolean);
+    if(!names.length){ flash($("#flash"),"Enter at least one teacher name."); return; }
+    const btn=$("#addTeachersBtn"); btn.disabled=true; const o=btn.textContent; btn.innerHTML='<span class="spinner"></span> Creating…';
+    try{
+      const res=await admin("bulk_create_teachers",{ schoolId:selectedSchool.id, teachers:names });
+      lastTeachers=res.created;
+      $("#tResultSummary").textContent=`Created ${res.createdCount} teacher logins`+(res.skippedCount?`, skipped ${res.skippedCount}`:"")+".";
+      $("#tResultTable").innerHTML="<tr><th>Name</th><th>Password</th></tr>"+res.created.map(c=>`<tr><td>${escapeHtml(c.name)}</td><td><code>${escapeHtml(c.password)}</code></td></tr>`).join("");
+      $("#tResultBox").style.display="block"; flash($("#flash"),"");
+    }catch(e){ flash($("#flash"), e.message); }
+    finally{ btn.disabled=false; btn.textContent=o; }
+  });
+  $("#tDlCsv").addEventListener("click",()=>{
+    const rows=[["Name","Password","School","Role"]].concat(lastTeachers.map(c=>[c.name,c.password,selectedSchool.name,"Teacher"]));
+    const csv=rows.map(r=>r.map(v=>`"${String(v).replace(/"/g,'""')}"`).join(",")).join("\n");
+    const blob=new Blob([csv],{type:"text/csv"}); const a=document.createElement("a");
+    a.href=URL.createObjectURL(blob); a.download=`${selectedSchool.code}-teachers.csv`; a.click();
+  });
+  $("#tDlPdf").addEventListener("click",()=>{
+    const { jsPDF }=window.jspdf; const doc=new jsPDF();
+    doc.setFontSize(16); doc.text("JCABSS AI — Teacher Logins",14,18);
+    doc.setFontSize(11); doc.text(`School: ${selectedSchool.name}  (${selectedSchool.code})`,14,27);
+    let y=42; doc.setFont(undefined,"bold"); doc.text("Name",14,y); doc.text("Password",120,y); doc.setFont(undefined,"normal"); y+=4; doc.line(14,y,196,y); y+=8;
+    lastTeachers.forEach(c=>{ if(y>280){doc.addPage();y=20;} doc.text(String(c.name).slice(0,55),14,y); doc.text(String(c.password),120,y); y+=8; });
+    doc.save(`${selectedSchool.code}-teachers.pdf`);
   });
 
   checkAdmin();

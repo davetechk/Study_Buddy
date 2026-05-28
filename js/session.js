@@ -103,6 +103,16 @@ async function dataCreateNote(learner, note) {
   return data;
 }
 
+// Fetch matching teacher material for a student's subject (for AI blending).
+// Returns "" for visitors (no school/teacher) or when nothing matches.
+async function findTeacherMaterial(learner, subject) {
+  if (learner.type !== "student" || !subject) return "";
+  try {
+    const res = await studentData("find_teacher_material", { subject });
+    return res.material || "";
+  } catch { return ""; }
+}
+
 async function dataDeleteNote(learner, id) {
   if (learner.type === "student") return studentData("delete_note",{id});
   const { error } = await sb.from("notes").delete().eq("id", id);

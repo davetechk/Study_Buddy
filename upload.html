@@ -42,8 +42,10 @@
     if(!content){ flash(flashEl,"Please add some notes to summarise."); return; }
     btn.disabled=true; const o=btn.textContent; btn.innerHTML='<span class="spinner"></span> Generating…';
     try{
-      const ai = await aiSummarize(content);
+      const teacherMaterial = await findTeacherMaterial(learner, subject);
+      const ai = await aiSummarize(content, teacherMaterial);
       const note = await dataCreateNote(learner, { title, subject, content, summary: ai.summary, bulletPoints: ai.bulletPoints });
+      if(ai.blended){ try{ sessionStorage.setItem("lastBlended","1"); }catch(e){} }
       go("note.html?id="+note.id);
     }catch(err){ flash(flashEl, err.message||"Could not create the note."); btn.disabled=false; btn.textContent=o; }
   });

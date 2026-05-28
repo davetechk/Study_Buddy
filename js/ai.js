@@ -5,21 +5,22 @@
 //  change the Edge Function — not this file.
 // ============================================================================
 
-async function aiSummarize(content) {
+async function aiSummarize(content, teacherMaterial = "") {
   const { data, error } = await sb.functions.invoke("ai-generate", {
-    body: { action: "summary", content }
+    body: { action: "summary", content, teacherMaterial }
   });
   if (error) throw new Error(humanError(error));
   if (data && data.error) throw new Error(data.error);
   return {
     summary: data.summary || "Could not generate summary.",
-    bulletPoints: data.bulletPoints || "- Could not generate bullet points."
+    bulletPoints: data.bulletPoints || "- Could not generate bullet points.",
+    blended: !!data.blended
   };
 }
 
-async function aiQuiz(content, count = 5) {
+async function aiQuiz(content, count = 5, teacherMaterial = "") {
   const { data, error } = await sb.functions.invoke("ai-generate", {
-    body: { action: "quiz", content, count }
+    body: { action: "quiz", content, count, teacherMaterial }
   });
   if (error) throw new Error(humanError(error));
   if (data && data.error) throw new Error(data.error);
